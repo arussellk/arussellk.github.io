@@ -1,2 +1,6 @@
-permalink: /posts/:title
 exclude: [CNAME]
+
+collections:
+  pages:
+    output: true
+    permalink: /:collection/:title
