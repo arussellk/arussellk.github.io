@@ -1,0 +1,26 @@
+---
+---
+// Two lines of triple dashes are necessary for
+// Jekyll to automatically process this file.
+// See https://jekyllrb.com/docs/assets/
+
+html {
+  background-color: #fefefe;
+}
+
+body {
+  margin: 40px auto;
+  max-width: 800px;
+  line-height: 1.6;
+  font-family: sans-serif;
+  color: #333;
+  font-size: 18px;
+}
+
+pre {
+  background: #eee;
+  margin: 0;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid black;
+}
