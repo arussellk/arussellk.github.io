@@ -10,17 +10,23 @@ html {
 
 body {
   margin: 40px auto;
-  max-width: 800px;
+  max-width: 650px;
   line-height: 1.6;
   font-family: sans-serif;
-  color: #333;
+  color: #222;
   font-size: 18px;
 }
 
 pre {
-  background: #eee;
+  background-color: #eee;
   margin: 0;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid black;
+  border: 1px solid #d4d4d4;
+}
+
+p > code {
+  background-color: #eee;
+  border-radius: 5px;
+  padding: 0 5px;
 }
