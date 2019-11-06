@@ -42,7 +42,7 @@ body {
 
 .main-content {
   margin: 0 auto;
-  padding: 0 $content-padding;
+  padding: 0 $content-padding $content-padding $content-padding;
   max-width: $content-width;
 }
 
