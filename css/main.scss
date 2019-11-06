@@ -4,29 +4,60 @@
 // Jekyll to automatically process this file.
 // See https://jekyllrb.com/docs/assets/
 
+$content-width: 650px;
+$content-padding: 10px;
+
 html {
   background-color: #fefefe;
 }
 
 body {
-  margin: 40px auto;
-  max-width: 650px;
+  margin: 0;
   line-height: 1.6;
   font-family: sans-serif;
   color: #222;
   font-size: 18px;
 }
 
+.header {
+  background-color: rebeccapurple;
+
+  a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    margin-right: 2*$content-padding;
+
+    &:hover {
+      color: #bbb;
+    }
+  }
+
+  .header-content {
+    max-width: $content-width;
+    margin: 0 auto;
+    padding: 0 $content-padding;
+  }
+}
+
+.main-content {
+  margin: 0 auto;
+  padding: 0 $content-padding;
+  max-width: $content-width;
+}
+
+$code-spacing: 10px;
+
 pre {
   background-color: #eee;
   margin: 0;
-  padding: 10px;
-  border-radius: 5px;
+  padding: $code-spacing;
+  border-radius: $code-spacing/2;
   border: 1px solid #d4d4d4;
 }
 
 p > code {
   background-color: #eee;
-  border-radius: 5px;
-  padding: 0 5px;
+  border-radius: $code-spacing/2;
+  padding: 0 $code-spacing/2;
 }
