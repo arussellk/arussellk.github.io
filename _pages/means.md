@@ -24,3 +24,43 @@ $$
 \frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}=
 \underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n}
 $$
+
+From those definitions we can now easily derive the formulas you
+typically see. You don't need to memorize these formulas - just derive
+them when you need them. :)
+
+### Deriving the standard formulas
+
+Arithmetic mean:
+
+$$
+\begin{align}
+\underbrace{a+a+\cdots+a}_{n} &=
+x_1+x_2+\cdots+x_n \\
+na &= x_1+x_2+\cdots+x_n \\[5pt]
+a &= \frac{x_1+x_2+\cdots+x_n}{n}
+\end{align}
+$$
+
+Geometric mean:
+
+$$
+\begin{align}
+\underbrace{g \times g \times \cdots \times g}_{n} &=
+x_1 \times x_2 \times \cdots \times x_n \\
+g^n &= x_1 \times x_2 \times \cdots \times x_n \\[5pt]
+g &= \sqrt[n]{x_1 \times x_2 \times \cdots \times x_n} \\
+\end{align}
+$$
+
+Harmonic mean:
+
+$$
+\begin{align}
+\underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n} &=
+\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}\\
+\frac{n}{h} &= \frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}\\[5pt]
+h &= \frac{n}{\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}}\\[5pt]
+h &= \frac{n}{\sum\limits_{i=1}^{n} \frac{1}{x_i}}
+\end{align}
+$$
