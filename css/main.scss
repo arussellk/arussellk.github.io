@@ -26,7 +26,8 @@ body {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
-    margin-right: 2*$content-padding;
+    margin-right: 3*$content-padding;
+    line-height: 5*$content-padding;
 
     &:hover {
       color: #bbb;
@@ -54,10 +55,17 @@ pre {
   padding: $code-spacing;
   border-radius: $code-spacing/2;
   border: 1px solid #d4d4d4;
+  overflow-x: scroll;
 }
 
 p > code {
   background-color: #eee;
   border-radius: $code-spacing/2;
   padding: 0 $code-spacing/2;
+}
+
+// MathJax
+.MathJax_Display {
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
