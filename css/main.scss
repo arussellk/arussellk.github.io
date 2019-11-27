@@ -4,8 +4,11 @@
 // Jekyll to automatically process this file.
 // See https://jekyllrb.com/docs/assets/
 
-$content-width: 650px;
+$content-width: 750px;
 $content-padding: 10px;
+
+$dark-text-color: #222;
+$light-text-color: #888;
 
 html {
   background-color: #fefefe;
@@ -15,7 +18,7 @@ body {
   margin: 0;
   line-height: 1.6;
   font-family: sans-serif;
-  color: #222;
+  color: $dark-text-color;
   font-size: 18px;
 }
 
@@ -45,6 +48,13 @@ body {
   margin: 0 auto;
   padding: 0 $content-padding $content-padding $content-padding;
   max-width: $content-width;
+}
+
+.posts-list {
+  .date {
+    color: $light-text-color;
+    font-size: 12px;
+  }
 }
 
 $code-spacing: 10px;
