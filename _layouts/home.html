@@ -1,0 +1,27 @@
+---
+layout: default
+---
+
+<div id="home">
+
+  {{content}}
+
+  <h2>Posts</h2>
+
+  <div>
+    This is a collection of intuitive or illustrative explanations
+    of various topics mostly in CS or math.
+    These explanations aren't necessarily exhaustive or formal proofs,
+    instead they serve to help me really understand
+    the what and why of these ideas.
+  </div>
+  <ul>
+    {% for post in site.posts %}
+      <li>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+        <br>
+        {{ post.date | date: "%-d %b %Y"}}
+      </li>
+    {% endfor %}
+  </ul>
+</div>

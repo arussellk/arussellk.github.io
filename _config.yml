@@ -1,6 +1,1 @@
 exclude: [CNAME,Gemfile,Gemfile.lock,README]
-
-collections:
-  pages:
-    output: true
-    permalink: /:collection/:title

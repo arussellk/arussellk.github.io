@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: Asymptotic Computational Complexity (Big O and friends)
 has_math: true
 ---
