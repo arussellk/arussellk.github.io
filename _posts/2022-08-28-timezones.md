@@ -17,11 +17,19 @@ The purpose of this post is to explain a situation that I encountered where it
 took some extra effort to convert the UTC datetime from the database to the
 appropriate timezone for display.
 
-This post assumes ... ISO_8601
-This post uses JavaScript and moment.js for code examples. You can go to ...
-and open your browsers JavaScript console to follow along with examples.
+This post uses
+[JavaScript](https://en.wikipedia.org/wiki/ECMAScript)
+and
+[Moment.js](https://momentjs.com/)
+for code example.
+You can go to
+[Moment.js Timezone](https://momentjs.com/timezone/)
+and open your developer console to execute and experiment with the examples
+yourself.
+Dates shown in this post follow the
+[ISO 8601 standard](https://en.wikipedia.org/wiki/ISO_8601)
 
-# Background? Bank Transactions
+# Background
 
 I worked on a system that showed users their bank account transaction
 history. Users could grant access to their transaction history via OAuth,
@@ -73,7 +81,7 @@ When a person sees a list of transactions and corresponding dates, they expect
 to see the date they were experiencing when the payment occurred, not the date
 of that instant in time represented in UTC.
 
-# What is the fix?
+# What is the solution?
 
 I have shown that the first ten characters of a UTC datetime string does not
 always match the transaction date.
@@ -97,198 +105,76 @@ const txnDate = moment(txn.utcDateTime).tz(zone).format('YYYY-MM-DD');
 console.log(txnDate); // 2022-05-01
 ```
 
+Knowing the country where the transaction took place is enough information for
+countries which only have one timezone.
+Since the bank that sent this data response is based in GB,
+including just the country in the
+API response is sufficient for many of their users.
+
 # What about transactions in the US?
+
+Suppose someone makes a purchase late one evening in Denver, CO, USA.
 
 ```
 // txn is loaded from the API
 const txn = {
-  utcDateTime: '2022-04-30T23:01:00.000Z',
-2022-04-30T16:34:56.789Z
-2022-04-30T12:34:56.789-04:00
+  utcDateTime: '2022-05-01T05:34:56.789Z', // equivalent to 2022-04-30T23:34:56-06:00
   country: 'US',
   // ...
 };
 
-const zones = moment.tz.zonesForCountry('GB'); // ['Europe/London']
-const zone = zones[0];
+const zones = moment.tz.zonesForCountry('US'); // (29) ['America/Adak', ..., 'Pacific/Honolulu']
+const zone = zones[0]; // This is not always correct. :(
 
-const txnDate = moment(txn.utcDateTime).tz(zone).format('YYYY-MM-DD');
-console.log(txnDate); // 2022-05-01
+moment.tz.zonesForCountry('US').map(z => {
+    const m = moment('2022-05-01T05:34:56.789Z').tz(z);
+    return `${m.format('YYYY-MM-DD')} in ${z} (${m.format('Z z')})`;
+});
+
+// [
+//   '2022-04-30 in America/Adak (-09:00 HDT)',
+//   '2022-04-30 in America/Anchorage (-08:00 AKDT)',
+//   '2022-04-30 in America/Boise (-06:00 MDT)',
+//   '2022-05-01 in America/Chicago (-05:00 CDT)',
+//   '2022-04-30 in America/Denver (-06:00 MDT)',
+//   '2022-05-01 in America/Detroit (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Indianapolis (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Knox (-05:00 CDT)',
+//   '2022-05-01 in America/Indiana/Marengo (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Petersburg (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Tell_City (-05:00 CDT)',
+//   '2022-05-01 in America/Indiana/Vevay (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Vincennes (-04:00 EDT)',
+//   '2022-05-01 in America/Indiana/Winamac (-04:00 EDT)',
+//   '2022-04-30 in America/Juneau (-08:00 AKDT)',
+//   '2022-05-01 in America/Kentucky/Louisville (-04:00 EDT)',
+//   '2022-05-01 in America/Kentucky/Monticello (-04:00 EDT)',
+//   '2022-04-30 in America/Los_Angeles (-07:00 PDT)',
+//   '2022-05-01 in America/Menominee (-05:00 CDT)',
+//   '2022-04-30 in America/Metlakatla (-08:00 AKDT)',
+//   '2022-05-01 in America/New_York (-04:00 EDT)',
+//   '2022-04-30 in America/Nome (-08:00 AKDT)',
+//   '2022-05-01 in America/North_Dakota/Beulah (-05:00 CDT)',
+//   '2022-05-01 in America/North_Dakota/Center (-05:00 CDT)',
+//   '2022-05-01 in America/North_Dakota/New_Salem (-05:00 CDT)',
+//   '2022-04-30 in America/Phoenix (-07:00 MST)',
+//   '2022-04-30 in America/Sitka (-08:00 AKDT)',
+//   '2022-04-30 in America/Yakutat (-08:00 AKDT)',
+//   '2022-04-30 in Pacific/Honolulu (-10:00 HST)',
+// ]
 ```
 
----
+The list above includes both 2022-05-01 and 2022-04-30, which demonstrates that
+it is not possible to always know a transaction date given the utcDateTime of a
+transaction that takes place in a country with more than one timezone.
 
-The transaction model looked something like this:
+I checked the API documentation. The API only tells the _country_ in which the
+transaction took place, not the _timezone_ in which the transaction took place.
+To fix the bug reported by this user, I manually investigated utcDateTimes
+given by this bank's API and concluded that this bank likely mapped the
+`'America/New_York'` timezone to the `'US'` country code. I adjusted the code
+to account for this case, shipped the change, and have not received bug reports
+of incorrect transaction dates since.
 
-```
-{
-  id: uint,
-  description: string,
-  time: string, // ISO 8601
-  // country: string, // ISO 3166 alpha-2 // don't include yet
-}
-```
-
-example
-```
-{
-  id: 1,
-  description: "Some Description",
-  amount: { currency: "USD", minorUnits: 1067, },
-  time: "2022-08-28T22:58:30Z",
-  // country: "DE",
-}
-```
-
-Now let's show this transaction to our user:
-- $10.67 _Some Description_ on 29 Aug 2022
-
-Oh no! What happened?
-
-The front end code probably looks like this:
-```
-${txn.amount} ${txn.description} on ${moment(tx.time)}
-```
-
-Users expect a transaction date to be the date they experienced when the
-payment occurred.
-
-links
-https://en.wikipedia.org/wiki/ISO_8601
-https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-https://developer.starlingbank.com/docs/aisp
-
-https://momentjs.com/timezone/
-
----
-
-Suppose you want to show something like this to a user:
-- $10.67 _Some Description_ on 29 Aug 2022
-
-And suppose you are getting the user's transactions from their bank's API:
-```
-{
-  "time": "2022-08-31T23:01:00.000Z",
-  ...
-}
-```
-
-Is this enough information? No.
-
-```
-moment("2022-08-31T23:01:00.000Z").utcOffset('-01:00')
-```
-
-The same number can be written different ways:
-```
-4+0
-3+1
-6-2
-```
-
-And the same instant in time can be written different ways:
-```
-examples
-moment('2010-10-20').isSame('2009-12-31', 'year');
-```
-
-Transaction Date and Transaction Instant.
-Birthdate and Birthinstant.
-Birthdates stay the same no matter what timezone you are in.
-
-Imagine two babies born at the same time in two different locations:
-Nandor in New York City, USA
-Tom in Tokyo, Japan
-
-On DATE New York City is in x (GMT-4)
-Tokyo (GMT+9?)
-
-Suppose both are born at the exact same time of DATE
-Nandor's doctor will write down that they were born at DATE-04 and say their birthday is 03
-Tom's doctor will write down that they were born at DATE+09 and say their birthday is 04
-
-If these two birthinstants are reported to a central database that stores everything
-in Z, we will have something like this:
-
-```
-Name   | Birthinstant (Z)
--------------------------
-Nandor |
-Tom    |
-```
-
-```
-{
-  "name": "Nandor",
-  "birthinstant": "..."
-}
-```
-
-From this API response, can we tell when we should celebrate Nandor's birthday?
-What about Tom's birthday?
-  No.
-
-Oh no! Quick - add a column to store the birth country!
-(This is what the neobank does.)
-
-```
-Name   | Birthinstant (Z) | Country
------------------------------------
-Nandor |                  | US
-Tom    |                  | JP
-```
-
-```
-{
-  "name": "Nandor",
-  "birthinstant": "...",
-  "country": "US"
-}
-```
-
-```
-moment.tz.zonesForCountry('JP') // just one
-moment.tz.zonesForCountry('US') // too many!
-
-moment('...').tz('Asia/Tokyo').format('...')
-```
-
----
-
-/*
-  moment('2022-04-30T23:01:00.000Z').tz('Europe/London').format()
-  '2022-05-01T00:01:00+01:00'
-
-  This code worked for some cases:
-  ```
-  moment('2022-01-02T22:30:00.000-01')
-    .toISOString() // '2022-01-02T23:30:00.000Z'
-    .slice(0, 'YYYY-MM-DD'.length) // '2022-01-02'
-  ```
-
-  ... but not for other cases:
-  ```
-  moment('2022-01-02T02:30:00.000+06').toISOString()
-  '2022-01-01T20:30:00.000Z'
-  moment('2022-01-02T22:30:00.000+06').toISOString()
-  '2022-01-02T16:30:00.000Z'
-  ```
-*/
-
----
-
-  When a user views a list of purchases,
-  they expect to see the date they were experiencing in the location they
-  were when they made the transaction.
-  e.g., If I am in the United States and purchase something from an Australian
-  company at `2022-09-06T22:30:00-06`, I say that the txn date is
-  `2022-09-06` even though it is `2022-09-07` in Sydney
-  (`2022-09-06T22:30:00-06 == 2022-09-07T14:30:00+10:00`).
-  Further, even if I travel to Sydney next week, I still say that I
-  purchased the thing on `2022-09-06` because it was `2022-09-06` for me when I
-  purchased it. (i.e., While looking at my purchase history from a new
-  location, I do not convert purchase timestamps to the timezone I am currently
-  standing in.)
-  So, we actually need _per-transaction_ timezone information instead of
-  _per-user_ timezone information. Fortunately, 
-
+Word of advice: if you ever design an API for transactions, please include the
+timezone in which the transaction took place, not just the country.
