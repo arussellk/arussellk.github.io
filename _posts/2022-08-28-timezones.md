@@ -21,13 +21,13 @@ This post uses
 [JavaScript](https://en.wikipedia.org/wiki/ECMAScript)
 and
 [Moment.js](https://momentjs.com/)
-for code example.
+for code examples.
 You can go to
 [Moment.js Timezone](https://momentjs.com/timezone/)
-and open your developer console to execute and experiment with the examples
+and open your developer console to execute and experiment with the code
 yourself.
 Dates shown in this post follow the
-[ISO 8601 standard](https://en.wikipedia.org/wiki/ISO_8601)
+[ISO 8601 standard](https://en.wikipedia.org/wiki/ISO_8601).
 
 # Background
 
@@ -52,34 +52,36 @@ console.log(txnDate); // '2022-04-30'
 
 The bug report said that this date should actually be `2022-05-01`.
 I checked which bank API this transaction came from, and it was a bank located
-in GB. The problem is that the existing code does not consider timezones, and
-the solution is to interpret the txn's utcDateTime in the timezone that the
-txn took place.
+in Great Britain (GB). The problem is that the existing code does not consider
+timezones, and the solution is to interpret the transaction's `utcDateTime` in
+the timezone that the transaction took place.
 
 # What went wrong?
 
 Before we fix the problem, let's look at how this code worked well enough that
 that previous author did not immediately notice the problem.
-Most of the users of this system were located in US and GB.
-This means that as long as a transaction occurs _late_ enough in a day in GB
+Most of the users of this system were located in the United States (US) and GB.
+This means that as long as a transaction occurs _late_ enough in the day in GB
 such that representing it in UTC still appears in the same date, the simple
-`.slice` works (i.e., after 1am or so while GB uses BST).
+`.slice` works (i.e., after 1am local time while GB is using British Summer
+Time).
 On the other side of things, as long as a transaction occurs _early_ enough in
-a day in the US such that represending it in UTC still appears in the same
-date, the simple `.slice` works (i.e., before 8pm on the East Coast).
-
-Examples:
-
-| Date                          | Date in UTC              | `.slice`   | `.slice` correct? |
-| ----------------------------- | ------------------------ | ---------- | ----------------- |
-| 2022-04-30T12:34:56.789-04:00 | 2022-04-30T16:34:56.789Z | 2022-04-30 | yes               |
-| 2022-04-30T20:34:56.789-04:00 | 2022-05-01T00:34:56.789Z | 2022-05-01 | no                |
-| 2022-05-01T00:01:00.000+01:00 | 2022-04-30T23:01:00.000Z | 2022-04-30 | no                |
-| 2022-05-01T01:01:00.000+01:00 | 2022-05-01T00:01:00.000Z | 2022-05-01 | yes               |
-
+the day in the US such that represending it in UTC still appears in the same
+date, the simple `.slice` works (i.e., before 8pm or so local time on the East
+Coast).
 When a person sees a list of transactions and corresponding dates, they expect
 to see the date they were experiencing when the payment occurred, not the date
-of that instant in time represented in UTC.
+of that instant represented in UTC, so it is necessary to interpret a
+transaction's `utcDateTime` in the right timezone prior to display for a user.
+
+Examples when `.slice` is correct and not correct:
+
+| Date                          | Date in UTC              | `.slice(utc)` | `.slice` correct? |
+| ----------------------------- | ------------------------ | ------------- | ----------------- |
+| 2022-04-30T12:34:56.789-04:00 | 2022-04-30T16:34:56.789Z | 2022-04-30    | yes               |
+| 2022-04-30T20:34:56.789-04:00 | 2022-05-01T00:34:56.789Z | 2022-05-01    | no                |
+| 2022-05-01T00:01:00.000+01:00 | 2022-04-30T23:01:00.000Z | 2022-04-30    | no                |
+| 2022-05-01T01:01:00.000+01:00 | 2022-05-01T00:01:00.000Z | 2022-05-01    | yes               |
 
 # What is the solution?
 
