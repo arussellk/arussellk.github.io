@@ -10,14 +10,12 @@ version of:
 2. Convert the UTC datetime to the user's timezone for display. (e.g.,
    `2022-01-08T10:45:00.000Z -> 2022-01-08T03:45:00-07:00`.)
 
-// This is a bit of a strawman. Just highlight that for transactions, the
-// "user's" timezone for display is the timezone the user was experiencing when
-// the transaction happened.
-This advice is sufficient for keeping track of a a single point in time (e.g.,
-when does the meeting start), but it is not an exhaustive list of advice. The
-purpose of this post is to demonstrate an example of when storing just a UTC
-datetime is not sufficient and give a useful analogy for how to consider dates
-in your application in the future.
+This advice is good for keeping track of a single point in time (e.g., when
+does the meeting start), but sometimes working with timezones is slightly more
+complicated.
+The purpose of this post is to explain a situation that I encountered where it
+took some extra effort to convert the UTC datetime from the database to the
+appropriate timezone for display.
 
 This post assumes ... ISO_8601
 This post uses JavaScript and moment.js for code examples. You can go to ...
@@ -25,7 +23,7 @@ and open your browsers JavaScript console to follow along with examples.
 
 # Background? Bank Transactions
 
-I worked on a system that showed users their bank account's transaction
+I worked on a system that showed users their bank account transaction
 history. Users could grant access to their transaction history via OAuth,
 allowing our system to read their transactions and display them in a nice way.
 One day I received a bug report that the transaction date shown in our system
@@ -34,32 +32,36 @@ getting the date from the bank's API and found that the previous author did not
 consider timezones in their implementation. The existing code looked like this:
 
 ```
-// Load txn from the API
+// txn is loaded from the API
 const txn = {
   utcDateTime: '2022-04-30T23:01:00.000Z',
-  ...
+  // ...
 };
 
-const txnDate = txn.utcDatetime.slice(0, 'YYYY-MM-DD'.length);
+const txnDate = txn.utcDateTime.slice(0, 'YYYY-MM-DD'.length);
 console.log(txnDate); // '2022-04-30'
 ```
 
 The bug report said that this date should actually be `2022-05-01`.
 I checked which bank API this transaction came from, and it was a bank located
 in GB. The problem is that the existing code does not consider timezones, and
-the solution is to interpret each txn's utcDateTime in the timezone that the
-txn took place. Before we fix the problem, ...
+the solution is to interpret the txn's utcDateTime in the timezone that the
+txn took place.
 
-How did this code work well enough that the previous author didn't immediately
-notice the problem? Most of the users of this system were located in US and GB.
-This means that as long as a txn occurs _late_ enough in a day in GB
-such that representing it in UTC still appears in the same date (i.e., after 1am
-or so while GB uses BST), then the simple `.slice` code works.
-On the other side of things, as long as a txn occurs _early_ enough in a day in the
-US so that represending it in UTC still appears in the same date (i.e., before 8pm on the east coast)
-then it works.
+# What went wrong?
 
-Table of examples:
+Before we fix the problem, let's look at how this code worked well enough that
+that previous author did not immediately notice the problem.
+Most of the users of this system were located in US and GB.
+This means that as long as a transaction occurs _late_ enough in a day in GB
+such that representing it in UTC still appears in the same date, the simple
+`.slice` works (i.e., after 1am or so while GB uses BST).
+On the other side of things, as long as a transaction occurs _early_ enough in
+a day in the US such that represending it in UTC still appears in the same
+date, the simple `.slice` works (i.e., before 8pm on the East Coast).
+
+Examples:
+
 | Date                          | Date in UTC              | `.slice`   | `.slice` correct? |
 | ----------------------------- | ------------------------ | ---------- | ----------------- |
 | 2022-04-30T12:34:56.789-04:00 | 2022-04-30T16:34:56.789Z | 2022-04-30 | yes               |
@@ -67,47 +69,54 @@ Table of examples:
 | 2022-05-01T00:01:00.000+01:00 | 2022-04-30T23:01:00.000Z | 2022-04-30 | no                |
 | 2022-05-01T01:01:00.000+01:00 | 2022-05-01T00:01:00.000Z | 2022-05-01 | yes               |
 
-/*
-  moment('2022-04-30T23:01:00.000Z').tz('Europe/London').format()
-  '2022-05-01T00:01:00+01:00'
+When a person sees a list of transactions and corresponding dates, they expect
+to see the date they were experiencing when the payment occurred, not the date
+of that instant in time represented in UTC.
 
-  This code worked for some cases:
-  ```
-  moment('2022-01-02T22:30:00.000-01')
-    .toISOString() // '2022-01-02T23:30:00.000Z'
-    .slice(0, 'YYYY-MM-DD'.length) // '2022-01-02'
-  ```
+# What is the fix?
 
-  ... but not for other cases:
-  ```
-  moment('2022-01-02T02:30:00.000+06').toISOString()
-  '2022-01-01T20:30:00.000Z'
-  moment('2022-01-02T22:30:00.000+06').toISOString()
-  '2022-01-02T16:30:00.000Z'
-  ```
-*/
+I have shown that the first ten characters of a UTC datetime string does not
+always match the transaction date.
+To always interpret a transaction's utcDateTime in the correct zone, I need to
+know in what timezone the transaction happened.
+Fortunately, the API I was reading from included a country code for each
+transaction, allowing me to fix the reported bug for the user in GB:
 
-Clearly, the first ten characters of an ISO datetime string is not always the
-same as the transaction date.
-Following the common advice I listed above, the bank's API already did the
-first part by giving me a UTC datetime. Now I just need to convert the UTC
-datetime to the user's timezone. But what does "the user's current timezone"
-mean for a transaction?
+```
+// txn is loaded from the API
+const txn = {
+  utcDateTime: '2022-04-30T23:01:00.000Z',
+  country: 'GB',
+  // ...
+};
 
-  When a user views a list of purchases,
-  they expect to see the date they were experiencing in the location they
-  were when they made the transaction.
-  e.g., If I am in the United States and purchase something from an Australian
-  company at `2022-09-06T22:30:00-06`, I say that the txn date is
-  `2022-09-06` even though it is `2022-09-07` in Sydney
-  (`2022-09-06T22:30:00-06 == 2022-09-07T14:30:00+10:00`).
-  Further, even if I travel to Sydney next week, I still say that I
-  purchased the thing on `2022-09-06` because it was `2022-09-06` for me when I
-  purchased it. (i.e., While looking at my purchase history from a new
-  location, I do not convert purchase timestamps to the timezone I am currently
-  standing in.)
-  So, we actually need _per-transaction_ timezone information instead of
-  _per-user_ timezone information. Fortunately, 
+const zones = moment.tz.zonesForCountry('GB'); // ['Europe/London']
+const zone = zones[0];
+
+const txnDate = moment(txn.utcDateTime).tz(zone).format('YYYY-MM-DD');
+console.log(txnDate); // 2022-05-01
+```
+
+# What about transactions in the US?
+
+```
+// txn is loaded from the API
+const txn = {
+  utcDateTime: '2022-04-30T23:01:00.000Z',
+2022-04-30T16:34:56.789Z
+2022-04-30T12:34:56.789-04:00
+  country: 'US',
+  // ...
+};
+
+const zones = moment.tz.zonesForCountry('GB'); // ['Europe/London']
+const zone = zones[0];
+
+const txnDate = moment(txn.utcDateTime).tz(zone).format('YYYY-MM-DD');
+console.log(txnDate); // 2022-05-01
+```
+
+---
 
 The transaction model looked something like this:
 
@@ -243,3 +252,43 @@ moment.tz.zonesForCountry('US') // too many!
 
 moment('...').tz('Asia/Tokyo').format('...')
 ```
+
+---
+
+/*
+  moment('2022-04-30T23:01:00.000Z').tz('Europe/London').format()
+  '2022-05-01T00:01:00+01:00'
+
+  This code worked for some cases:
+  ```
+  moment('2022-01-02T22:30:00.000-01')
+    .toISOString() // '2022-01-02T23:30:00.000Z'
+    .slice(0, 'YYYY-MM-DD'.length) // '2022-01-02'
+  ```
+
+  ... but not for other cases:
+  ```
+  moment('2022-01-02T02:30:00.000+06').toISOString()
+  '2022-01-01T20:30:00.000Z'
+  moment('2022-01-02T22:30:00.000+06').toISOString()
+  '2022-01-02T16:30:00.000Z'
+  ```
+*/
+
+---
+
+  When a user views a list of purchases,
+  they expect to see the date they were experiencing in the location they
+  were when they made the transaction.
+  e.g., If I am in the United States and purchase something from an Australian
+  company at `2022-09-06T22:30:00-06`, I say that the txn date is
+  `2022-09-06` even though it is `2022-09-07` in Sydney
+  (`2022-09-06T22:30:00-06 == 2022-09-07T14:30:00+10:00`).
+  Further, even if I travel to Sydney next week, I still say that I
+  purchased the thing on `2022-09-06` because it was `2022-09-06` for me when I
+  purchased it. (i.e., While looking at my purchase history from a new
+  location, I do not convert purchase timestamps to the timezone I am currently
+  standing in.)
+  So, we actually need _per-transaction_ timezone information instead of
+  _per-user_ timezone information. Fortunately, 
+
