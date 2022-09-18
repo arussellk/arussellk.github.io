@@ -66,7 +66,7 @@ such that representing it in UTC still appears in the same date, the simple
 `.slice` works (i.e., after 1am local time while GB is using British Summer
 Time).
 On the other side of things, as long as a transaction occurs _early_ enough in
-the day in the US such that represending it in UTC still appears in the same
+the day in the US such that representing it in UTC still appears in the same
 date, the simple `.slice` works (i.e., before 8pm or so local time on the East
 Coast).
 When a person sees a list of transactions and corresponding dates, they expect
@@ -86,10 +86,10 @@ Examples when `.slice` is correct and not correct:
 # What is the solution?
 
 I have shown that the first ten characters of a UTC datetime string does not
-always match the transaction date.
+always match the transaction date a user expects to see.
 To always interpret a transaction's utcDateTime in the correct zone, I need to
 know in what timezone the transaction happened.
-Fortunately, the API I was reading from included a country code for each
+Fortunately, the bank API I was reading from included a country code for each
 transaction, allowing me to fix the reported bug for the user in GB:
 
 ```
@@ -107,11 +107,14 @@ const txnDate = moment(txn.utcDateTime).tz(zone).format('YYYY-MM-DD');
 console.log(txnDate); // 2022-05-01
 ```
 
-Knowing the country where the transaction took place is enough information for
-countries which only have one timezone.
+Knowing the country where a transaction took place is enough information to
+unambiguously find the transaction date for countries which only have one
+timezone.
 Since the bank that sent this data response is based in GB,
 including just the country in the
 API response is sufficient for many of their users.
+However, the code above is incomplete for countries which have more than one
+timezone (e.g., the United States).
 
 # What about transactions in the US?
 
@@ -120,7 +123,7 @@ Suppose someone makes a purchase late one evening in Denver, CO, USA.
 ```
 // txn is loaded from the API
 const txn = {
-  utcDateTime: '2022-05-01T05:34:56.789Z', // equivalent to 2022-04-30T23:34:56-06:00
+  utcDateTime: '2022-05-01T05:34:56.789Z', // same as 2022-04-30T23:34:56-06:00
   country: 'US',
   // ...
 };
@@ -167,16 +170,20 @@ moment.tz.zonesForCountry('US').map(z => {
 ```
 
 The list above includes both 2022-05-01 and 2022-04-30, which demonstrates that
-it is not possible to always know a transaction date given the utcDateTime of a
-transaction that takes place in a country with more than one timezone.
+it is not possible to always know a transaction date given the `utcDateTime` and
+country of a transaction that takes place in a country with more than one
+timezone.
 
-I checked the API documentation. The API only tells the _country_ in which the
-transaction took place, not the _timezone_ in which the transaction took place.
-To fix the bug reported by this user, I manually investigated utcDateTimes
-given by this bank's API and concluded that this bank likely mapped the
-`'America/New_York'` timezone to the `'US'` country code. I adjusted the code
-to account for this case, shipped the change, and have not received bug reports
+Continuing on my goal of fixing the bug for our users in both GB and US, I
+checked the bank API documentation.
+Unfortunately, the API only gives the _country_ in which the transaction took
+place, not the _timezone_ in which the transaction took place.
+Unfazed, I made an informed guess and got lucky:
+I manually investigated the `utcDateTimes` of transactions given by this bank's
+API that took place in the US and concluded that this bank used the `'US'`
+country code to mean the `'America/New_York'` timezone. I adjusted the code to
+account for this case, published the change, and have not received bug reports
 of incorrect transaction dates since.
 
-Word of advice: if you ever design an API for transactions, please include the
-timezone in which the transaction took place, not just the country.
+Concluding word of advice: if you ever design an API for transactions, please
+include the timezone in which the transaction took place, not just the country.
