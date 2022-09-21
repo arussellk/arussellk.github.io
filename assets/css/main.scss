@@ -1,0 +1,42 @@
+$content-width: 900px;
+$content-padding: 10px;
+
+$dark-text-color: #222;
+$light-text-color: #888;
+
+$primary-color: #0097a7;
+
+html {
+  background-color: #fefefe;
+}
+
+body {
+  margin: 0;
+  line-height: 1.6;
+  font-family: sans-serif;
+  color: $dark-text-color;
+  font-size: 16px;
+}
+
+.main {
+  margin: 0 auto;
+  padding: 0 $content-padding $content-padding $content-padding;
+  max-width: $content-width;
+}
+
+$code-spacing: 10px;
+
+pre {
+  background-color: #eee;
+  margin: 0;
+  padding: $code-spacing;
+  border-radius: $code-spacing/2;
+  border: 1px solid #d4d4d4;
+  overflow-x: scroll;
+}
+
+code {
+  background-color: #eee;
+  border-radius: $code-spacing/2;
+  padding: 0 $code-spacing/2;
+}
