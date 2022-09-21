@@ -1,0 +1,27 @@
+html {
+  background-color: #fefefe; }
+
+body {
+  margin: 0;
+  line-height: 1.6;
+  font-family: sans-serif;
+  color: #222;
+  font-size: 16px; }
+
+.main {
+  margin: 0 auto;
+  padding: 0 10px 10px 10px;
+  max-width: 900px; }
+
+pre {
+  background-color: #eee;
+  margin: 0;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #d4d4d4;
+  overflow-x: scroll; }
+
+code {
+  background-color: #eee;
+  border-radius: 5px;
+  padding: 0 5px; }

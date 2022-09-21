@@ -1,0 +1,38 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Covariance and Contravariance</title><link rel=stylesheet href=/css/main.css></head><body><div class=main><h1>Covariance and Contravariance</h1><p>The concept of covariance and contravariance can be difficult to grasp or remember. This is how I remember it.</p><h2 id=types>Types</h2><p>Here is a type that has a name and age:</p><pre tabindex=0><code>{ name, age }
+</code></pre><p>Here is a type that has an x, y, and z:</p><pre tabindex=0><code>{ x, y, z }
+</code></pre><h2 id=subtypes>Subtypes</h2><p>More complex types are subtypes of simpler types. This means that some type B is a subtype of A:</p><pre tabindex=0><code>B &lt; A
+</code></pre><p>Or, using the object notation from before:</p><pre tabindex=0><code>{ x, y, z } &lt; { x, y } &lt; { x } &lt; { }
+</code></pre><h2 id=subtype-example>Subtype example</h2><p>Time for code!</p><pre tabindex=0><code>var in: { x, y }
+var out: { x, y } = foo(in)
+print(out.x)
+print(out.y)
+</code></pre><p>We start with a variable <code>in</code>, which is a type that has an <code>x</code> and a <code>y</code>. We pass <code>in</code> into <code>foo</code> and get some result that happens to have the same type. Then we do some stuff with <code>out</code>.</p><p><code>foo</code> might look like this:</p><pre tabindex=0><code>fun foo(in: { x, y }):
+  print(in.x)
+  print(in.y)
+  return { in.x+1, in.y+1 }
+</code></pre><p><code>foo</code> demands that it is given something with <code>x</code> and <code>y</code> and promises to return something else that has <code>x</code> and <code>y</code>.</p><p>Can we change the type of <code>in</code>? Or the return type of <code>foo</code>? Sure! You can always pass in a subtype or return a subtype.</p><pre tabindex=0><code>fun foo(in: { x, y }):
+  print(in.x)
+  print(in.y)
+  return { in.x+1, in.y+1, a }
+
+var in: { x, y, z }
+var out: { x, y } = foo(in)
+print(out.x)
+print(out.y)
+</code></pre><h2 id=covariancecontravariance-example>Covariance/Contravariance Example</h2><p>Covariance and contravariance are properties of a function. They describe what you can and can&rsquo;t do if you want to substitute a function.</p><p>Will this work?</p><pre tabindex=0><code>fun foo(in: { x, y }):
+  print(in.x)
+  print(in.y)
+  return { in.x+1, in.y+1 }
+
+fun bar(in: { x, y, z }):
+  print(in.x)
+  print(in.y)
+  print(in.z)
+  return { in.x+1, in.y+1 }
+
+var in: { x, y }
+// var out: { x, y } = foo(in)
+var out: { x, y } = bar(in)
+print(out.x)
+print(out.y)
+</code></pre></div></body></html>

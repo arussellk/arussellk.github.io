@@ -1,0 +1,34 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Arithmetic, Geometric, and Harmonic means</title><link rel=stylesheet href=/css/main.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.css integrity=sha384-bYdxxUwYipFNohQlHt0bjN/LCpueqWz13HufFEV1SUatKs1cm4L6fFgCi1jT643X crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.min.js integrity=sha384-Qsn9KnoKISj6dI8g7p1HBlNpVx0I8p1SvlwOldgi3IorMle61nQy4zEahWYtljaz crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><div class=main><h1>Arithmetic, Geometric, and Harmonic means</h1><p>An arithmetic mean is the value \(a\) such that:</p><p>$$
+x_1+x_2+\cdots+x_n =
+\underbrace{a+a+\cdots+a}_{n}
+$$</p><p>A geometric mean is the value \(g\) such that:</p><p>$$
+x_1 \times x_2 \times \cdots \times x_n =
+\underbrace{g \times g \times \cdots \times g}_{n}
+$$</p><p>A harmonic mean is the value \(h\) such that:</p><p>$$
+\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}=
+\underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n}
+$$</p><h3 id=deriving-the-standard-formulas>Deriving the standard formulas</h3><p>Arithmetic mean:</p><p>$$
+\begin{aligned}
+\underbrace{a+a+\cdots+a}_{n} &=
+x_1+x_2+\cdots+x_n \\
+na &= x_1+x_2+\cdots+x_n \\
+a &= \frac{x_1+x_2+\cdots+x_n}{n}
+\end{aligned}
+$$</p><p>Geometric mean:</p><p>$$
+\begin{aligned}
+\underbrace{g \times g \times \cdots \times g}_{n} &=
+x_1 \times x_2 \times \cdots \times x_n \\
+g^n &= x_1 \times x_2 \times \cdots \times x_n \\
+g &= \sqrt[n]{x_1 \times x_2 \times \cdots \times x_n}
+\end{aligned}
+$$</p><p>Harmonic mean:
+$$
+\begin{aligned}
+\underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n} &=
+\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n} \\
+\frac{n}{h} &= \frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n} \\
+h &= \frac{n}{\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}} \\
+h &= \frac{n}{ \displaystyle \sum_{i=1}^n \frac{1}{x_i}}
+\end{aligned}
+$$</p></div></body></html>
