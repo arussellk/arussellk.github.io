@@ -33,6 +33,10 @@ pre {
   border-radius: $code-spacing/2;
   border: 1px solid #d4d4d4;
   overflow-x: scroll;
+
+  > code {
+    padding: 0;
+  }
 }
 
 code {
