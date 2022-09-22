@@ -20,6 +20,8 @@ pre {
   border-radius: 5px;
   border: 1px solid #d4d4d4;
   overflow-x: scroll; }
+  pre > code {
+    padding: 0; }
 
 code {
   background-color: #eee;
