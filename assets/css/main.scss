@@ -53,3 +53,9 @@ table {
     padding: 8px;
   }
 }
+
+#profile {
+  width: 150px;
+  border: 2px solid $dark-text-color;
+  border-radius: 50%;
+}
