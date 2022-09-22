@@ -40,3 +40,16 @@ code {
   border-radius: $code-spacing/2;
   padding: 0 $code-spacing/2;
 }
+
+table {
+  border-collapse: collapse;
+
+  padding: 8px;
+  width: 100%;
+  text-align: left;
+
+  th, td {
+    border: 1px solid #d4d4d4;
+    padding: 8px;
+  }
+}
