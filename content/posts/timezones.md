@@ -85,11 +85,13 @@ Examples when `.slice` is correct and not correct:
 
 # What is the solution?
 
-I have shown that the first ten characters of a UTC datetime string does not
+I have shown that the `YYYY-MM-DD` part of a UTC datetime string does not
 always match the transaction date a user expects to see.
 To always interpret a transaction's utcDateTime in the correct zone, I need to
 know in what timezone the transaction happened.
-Fortunately, the bank API I was reading from included a country code for each
+Fortunately, the bank API I was reading from included a
+[two-letter ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+country code for each
 transaction, allowing me to fix the reported bug for the user in GB:
 
 ```
@@ -174,16 +176,40 @@ it is not possible to always know a transaction date given the `utcDateTime` and
 country of a transaction that takes place in a country with more than one
 timezone.
 
-Continuing on my goal of fixing the bug for our users in both GB and US, I
-checked the bank API documentation.
-Unfortunately, the API only gives the _country_ in which the transaction took
-place, not the _timezone_ in which the transaction took place.
-Unfazed, I made an informed guess and got lucky:
-I manually investigated the `utcDateTimes` of transactions given by this bank's
-API that took place in the US and concluded that this bank used the `'US'`
-country code to mean the `'America/New_York'` timezone. I adjusted the code to
-account for this case, published the change, and have not received bug reports
-of incorrect transaction dates since.
+Continuing on my goal of fixing the occasional wrong date for our users in both
+GB and US, I checked the bank API documentation.
+Unfortunately, the API only gave the _country code_ in which the transaction
+took place, not the _timezone_ in which the transaction took place, so it
+seemed like I could not unambiguously resolve dates for transactions in the US.
+After some investigation, I noticed that some transaction dates appeared to be
+from automatically generated recurring payments with perfectly round
+timestamps, e.g.,
+`2022-03-01T05:01:00Z` and
+`2022-04-01T04:01:00Z`.
+Note that the hour is different in the two timestamps; these timestamps
+corresponded to the first minute of the first day of the month in the
+`'America/New_York'` timezone.
 
-Concluding word of advice: if you ever design an API for transactions, please
-include the timezone in which the transaction took place, not just the country.
+```
+moment('2022-03-01T05:01:00Z').tz('America/New_York').format()
+//     '2022-03-01T00:01:00-05:00'
+
+moment('2022-04-01T04:01:00Z').tz('America/New_York').format()
+//     '2022-04-01T00:01:00-04:00'
+```
+
+I manually investigated more `utcDateTimes` given by this bank's API that took
+place with the `'US'` country code and concluded that this bank used `'US'` to
+mean the `'America/New_York'` timezone.
+I adjusted our code to have a special case for `'US'` transactions from this
+bank API, published the change, and have not received bug reports of incorrect
+transaction dates since. :)
+Unfortunately, my fix for the `'US'` transactions is specific to this bank API
+and the exact implementation of the API when I performed my investigation.
+Eventually, this bank may receive enough complaints about transaction dates
+from developers like me to prioritize changing the API, but banks move slowly
+enough that I wanted to record and share my findings.
+
+Concluding word of advice: if you ever design an API for information where
+users care about the _date_ that something happened (not just the _instant_
+that it happened), please include the timezone in which the event took place.
