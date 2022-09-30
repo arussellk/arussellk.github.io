@@ -1,4 +1,4 @@
-$content-width: 900px;
+$content-width: 650px;
 $content-padding: 10px;
 
 $dark-text-color: #222;
@@ -22,6 +22,7 @@ body {
   margin: 0 auto;
   padding: 0 $content-padding $content-padding $content-padding;
   max-width: $content-width;
+  max-width: 75ch;
 }
 
 $code-spacing: 10px;
