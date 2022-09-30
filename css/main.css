@@ -11,7 +11,8 @@ body {
 .main {
   margin: 0 auto;
   padding: 0 10px 10px 10px;
-  max-width: 900px; }
+  max-width: 650px;
+  max-width: 75ch; }
 
 pre {
   background-color: #eee;
