@@ -1,2 +1,3 @@
 baseURL = 'https://arussellk.github.io'
 title = 'rk'
+enableEmoji = true
