@@ -3,7 +3,6 @@ html {
 
 body {
   margin: 0;
-  line-height: 1.6;
   font-family: sans-serif;
   color: #222;
   font-size: 16px; }
@@ -12,22 +11,23 @@ body {
   margin: 0 auto;
   padding: 0 10px 10px 10px;
   max-width: 650px;
-  max-width: 75ch; }
+  max-width: 80ch; }
 
 pre {
   background-color: #eee;
   margin: 0;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 8px;
+  border-radius: 4px;
   border: 1px solid #d4d4d4;
-  overflow-x: scroll; }
+  overflow-x: scroll;
+  font-size: 15px; }
   pre > code {
     padding: 0; }
 
 code {
   background-color: #eee;
-  border-radius: 5px;
-  padding: 0 5px; }
+  border-radius: 4px;
+  padding: 0 4px; }
 
 table {
   border-collapse: collapse;

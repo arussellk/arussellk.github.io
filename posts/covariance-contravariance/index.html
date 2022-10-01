@@ -1,38 +1,140 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Covariance and Contravariance</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Covariance and Contravariance</h1><p>The concept of covariance and contravariance can be difficult to grasp or remember. This is how I remember it.</p><h2 id=types>Types</h2><p>Here is a type that has a name and age:</p><pre tabindex=0><code>{ name, age }
-</code></pre><p>Here is a type that has an x, y, and z:</p><pre tabindex=0><code>{ x, y, z }
-</code></pre><h2 id=subtypes>Subtypes</h2><p>More complex types are subtypes of simpler types. This means that some type B is a subtype of A:</p><pre tabindex=0><code>B &lt; A
-</code></pre><p>Or, using the object notation from before:</p><pre tabindex=0><code>{ x, y, z } &lt; { x, y } &lt; { x } &lt; { }
-</code></pre><h2 id=subtype-example>Subtype example</h2><p>Time for code!</p><pre tabindex=0><code>var in: { x, y }
-var out: { x, y } = foo(in)
-print(out.x)
-print(out.y)
-</code></pre><p>We start with a variable <code>in</code>, which is a type that has an <code>x</code> and a <code>y</code>. We pass <code>in</code> into <code>foo</code> and get some result that happens to have the same type. Then we do some stuff with <code>out</code>.</p><p><code>foo</code> might look like this:</p><pre tabindex=0><code>fun foo(in: { x, y }):
-  print(in.x)
-  print(in.y)
-  return { in.x+1, in.y+1 }
-</code></pre><p><code>foo</code> demands that it is given something with <code>x</code> and <code>y</code> and promises to return something else that has <code>x</code> and <code>y</code>.</p><p>Can we change the type of <code>in</code>? Or the return type of <code>foo</code>? Sure! You can always pass in a subtype or return a subtype.</p><pre tabindex=0><code>fun foo(in: { x, y }):
-  print(in.x)
-  print(in.y)
-  return { in.x+1, in.y+1, a }
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Covariance and Contravariance</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Covariance and Contravariance</h1><p>Covariance and contravariance are properties of code substitution;
+they describe what you can and can&rsquo;t do if you want to replace some code
+(e.g., a function call)
+with some other code
+(e.g., a different function call)
+in a type-safe way.</p><p>I initially found the concept of covariance and contravariance to be difficult
+to grasp.
+This post starts with types and slowly builds to a practical example of
+covariance and contravariance in a way that will hopefully help you understand
+it when needed.</p><h2 id=types>Types</h2><p>In TypeScript, you could define and use types to describe objects like this:</p><pre tabindex=0><code>// Define the type Foo and use it by name:
+type Foo = { name: string, age: number };
+const foo: Foo = { name: &#39;Geralt&#39;, age: 98 };
 
-var in: { x, y, z }
-var out: { x, y } = foo(in)
-print(out.x)
-print(out.y)
-</code></pre><h2 id=covariancecontravariance-example>Covariance/Contravariance Example</h2><p>Covariance and contravariance are properties of a function. They describe what you can and can&rsquo;t do if you want to substitute a function.</p><p>Will this work?</p><pre tabindex=0><code>fun foo(in: { x, y }):
-  print(in.x)
-  print(in.y)
-  return { in.x+1, in.y+1 }
+// Use the type directly:
+const bar: { a: number, b: number } = { a: 1, b: 2 };
+console.log(bar.a); // 1
+console.log(bar.b); // 2
+</code></pre><p>I think the concept of variance can be more simply and intuitively understood
+with just the <em>existence</em> of fields, so let&rsquo;s consider a type system that
+contains only object types, and say that the object types can either have a
+field or not, and there is no regard for whether the field would hold a string,
+boolean, number, etc.
+As examples,
+this is a type that has the fields name and age: <code>{ name, age }</code>,
+and this is a type that has the fields a, b, and c: <code>{ a, b, c }</code>.</p><h2 id=subtypes-and-supertypes>Subtypes and Supertypes</h2><p>Subtypes extend other types.
+In our simplified type system that only considers the existence of a field,
+subtypes have <em>more</em> fields than the simpler types they extend.
+Restated, the set of fields of a subtype are a superset of the fields of the
+type it extends.</p><p>The symbol <code>&lt;:</code> means &ldquo;is a subtype of&rdquo;,
+so <code>S &lt;: T</code> means that some type <code>S</code> is a subtype of <code>T</code>.
+Using the field syntax from before, this is a chain of subtypes:</p><pre tabindex=0><code>{ a, b, c } &lt;: { a, b } &lt;: { a } &lt;: { }
+</code></pre><p>Going the other way, the symbol <code>:></code> means &ldquo;is a supertype of&rdquo;,
+so <code>T :> S</code> means that some type <code>T</code> is a supertype of <code>S</code>.
+This is a chain of supertypes:</p><pre tabindex=0><code>{ } :&gt; { d } :&gt; { d, e } :&gt; { d, e, f }
+</code></pre><h2 id=base-code>Base Code</h2><p>Let&rsquo;s define a function <code>foo</code> that takes an input with <code>a</code> and <code>b</code> fields
+and returns an output with an <code>x</code> field.
+This code constructs some input for <code>foo</code> with the <code>in</code> variable,
+and collect <code>foo</code>s output in the <code>out</code> variable.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { x }
+  return { x: arg.a + arg.b }
 
-fun bar(in: { x, y, z }):
-  print(in.x)
-  print(in.y)
-  print(in.z)
-  return { in.x+1, in.y+1 }
+var in: { a, b } = { a: 1, b: 2 }
+var out: { x } = foo(in)
+print(out.x) // 3
+</code></pre><p>We are going to modify the above code in several ways to explore when changing
+a function&rsquo;s parameter type and return type is valid and invalid.
+✅ indicates that the modification in the section produces a
+valid program.
+❌ indicates that the modification produces an invalid program.</p><h3 id=-the-caller-subtypes-the-argument>✅ The Caller Subtypes the Argument</h3><p>Let&rsquo;s add another field <code>c</code> to the <code>in</code> variable before passing it into <code>foo</code>,
+but keep the implementation of <code>foo</code> the same.
+This program is still valid because it is valid for any caller of <code>foo</code> to pass
+in any subtype of <code>{ a, b }</code>; after all, <code>foo</code> only needs to be able to access
+the <code>a</code> and <code>b</code> fields of the parameter.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { x }
+  return { x: arg.a + arg.b }
 
-var in: { x, y }
-// var out: { x, y } = foo(in)
-var out: { x, y } = bar(in)
+var in: { a, b, c } = { a: 1, b: 2, c: 3 }
+var out: { x } = foo(in)
+print(out.x) // 3
+</code></pre><h3 id=-the-function-subtypes-the-return-type>✅ The Function Subtypes the Return Type</h3><p>This time, let&rsquo;s change <code>foo</code>s implementation and add another field <code>y</code> to the
+return type, but keep the calling code the same.
+The code that comes after the call to <code>foo</code> only attempts to access the <code>x</code>
+field, so it ok for <code>foo</code> to return any subtype of <code>{ x }</code> and this program
+remains valid.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { x, y }
+  return { x: arg.a, y: arg.b }
+
+var in: { a, b } = { a: 1, b: 2 }
+var out: { x } = foo(in)
+print(out.x) // 3
+</code></pre><h3 id=-the-function-subtypes-the-argument-type>❌ The Function Subtypes the Argument Type</h3><p>Let&rsquo;s modify <code>foo</code> to require its parameter to have a <code>c</code> field,
+but keep the calling site the same.
+This program is no longer valid because the input to <code>foo</code> does not have a <code>c</code>.</p><pre tabindex=0><code>function foo(arg: { a, b, c }) -&gt; { x }
+  return { x: arg.a + arg.b + arg.c }
+
+var in: { a, b } = { a: 1, b: 2 }
+var out: { x } = foo(in) // Error: &#39;in&#39; is missing the &#39;c&#39; field.
 print(out.x)
-print(out.y)
-</code></pre></div></body></html>
+</code></pre><h3 id=-the-function-supertypes-the-argument-type>✅ The Function Supertypes the Argument Type</h3><p>This is the same case as when
+<a href=#-the-caller-subtypes-the-argument>the caller subtypes the argument</a>,
+but from the perspective of replacing the function <code>foo</code>.</p><pre tabindex=0><code>function foo(arg: { a }) -&gt; { x }
+  return { x: arg.a }
+
+var in: { a, b } = { a: 1, b: 2 }
+var out: { x } = foo(in)
+print(out.x) // 1
+</code></pre><h3 id=-the-function-supertypes-the-return-type>❌ The Function Supertypes the Return Type</h3><p>Let&rsquo;s modify <code>foo</code> to return the type <code>{ }</code> (a supertype of <code>{ x }</code>),
+but keep the calling site the same.
+This program is no longer valid because the output of <code>foo</code> does not have an
+<code>x</code>.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { }
+  return { }
+
+var in: { a, b } = { a: 1, b: 2 }
+var out: { x } = foo(in) // Error: no &#39;x&#39; on return type of &#39;foo&#39;.
+print(out.x)
+</code></pre><h2 id=typescript-example>TypeScript Example</h2><p>The following TypeScript is an implementation of the valid and invalid function
+substitution that we&rsquo;ve looked at so far.</p><pre tabindex=0><code>type A   = { a };
+type AB  = { a, b };
+type ABC = { a, b, c };
+type X   = { x };
+type XY  = { x, y };
+
+interface Type {
+    foo: (arg: AB) =&gt; X
+}
+
+interface ValidSubType extends Type {
+    // Imposes fewer restrictions on the input it needs and guarantees to
+    // return the fields you would expect from calling Type.foo.
+    foo: (arg: A) =&gt; XY
+}
+
+interface InvalidSubTypeBadInput extends Type {
+    // Tries to impose a new requirement on calls to foo (that the input will
+    // have a &#34;c&#34; field).
+    foo: (arg: ABC) =&gt; X
+}
+
+interface InvalidSubTypeBadOutput extends Type {
+    // Does not fulfill the promise made by &#34;foo&#34; (that the return type will
+    // have an &#34;x&#34; field).
+    foo: (arg: AB) =&gt; { }
+}
+</code></pre><p>If you view the code in the
+<a href="https://www.typescriptlang.org/play?noImplicitAny=false#code/C4TwDgpgBAgl8F4oG8oEMoF8DcAoUksAQoiugDRQBGWeB0MRAwlEqmpVZQMa37jQAGvFZkAHn3pRBATVKoxlEH1wBLAHbAIAJwBmabtAAqAlLhFRdAeysAuKAAo02gOb3GASlYA+abky4apo6+oZQAGpoADaqACYAygCuVCaEEGJa6rEAzlCp0MjmIgD0xVAAkgC2YFbZELm6EADuOlDa9cDaqtzAqlbquf1QwAAW0BpgicBQqtPqEBA56FlQLonOaMH1w1ZF8KVtEMCJ2urDY5aqEFFLIFaJUE33N1DpkD2W2laVUNzRMeoXHkBAA6axWEF7Sw2exOVzuLwIXyyfyBDRaPQGaDldQAN2icSSKQERDQsRxk2m6UyS3yZgsByMXW2wCsM2qtWgGHmTUOAEdEqp2pUIJooEM-lEorlWdC2Q5RmhpqNxupKY9VFKoQcRmhcVyoAAibiGy7XWIeSEWcGw5xuYhMRHI1FBDGhbF4gkJZL5UmxADyU3V1NFtNMhQZZQAIlZtuorNNdIkorpNVFztAwF9Kqo6lBKmToFRlIbwaaFbrlRd2sdTsNTE009qyrr9csjWJTanzZaoTbHHb3EQnWQAgEgA">TypeScript Playground</a>,
+you will see the errors
+<code>Interface 'InvalidSubTypeBadInput' incorrectly extends interface 'Type'.</code>
+and
+<code>Interface 'InvalidSubTypeBadOutput' incorrectly extends interface 'Type'.</code>
+along with additional information on what is incorrect.</p><p>Let&rsquo;s focus on the <code>ValidSubType</code> and connect it to covariance and
+contravariance:</p><ul><li><code>ValidSubType</code> is a subtype of <code>Type</code>,
+and <code>ValidSubType</code>&rsquo;s return type <code>XY</code> is a subtype of <code>Type</code>&rsquo;s return type
+<code>X</code>.
+Since the type relation of <code>ValidSubType &lt;: Type</code> is the same direction
+as <code>XY &lt;: X</code>, a function return type is said to be covariant.</li><li><code>ValidSubType</code> is a subtype of <code>Type</code>,
+and <code>ValidSubType</code>&rsquo;s argument type <code>A</code> is a supertype of <code>Type</code>&rsquo;s argument
+type <code>AB</code>.
+Since the type relation of <code>ValidSubType &lt;: Type</code> is the opposite direction
+as <code>AB :> A</code>, a function argument type is said to be contravariant.</li></ul><p>In this post I have focused on the idea of substitution for a function call,
+but the property of substitution applies to arrays and generics too.
+The
+<a href=https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)>Wikipedia article on covariance and contravariance</a>
+has more information.</p></div></body></html>
