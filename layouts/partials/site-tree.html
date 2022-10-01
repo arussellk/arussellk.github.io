@@ -1,0 +1,15 @@
+<ul>
+  {{ range .Pages }}
+    <li>
+      {{ if .IsPage }}
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      {{ else }}
+        {{/* build layouts/_default/list.html before linking to list pages */}}
+        {{ .Title }}
+      {{ end }}
+    </li>
+    {{ if .Pages }}
+      {{ partial "site-tree.html" . }}
+    {{ end }}
+  {{ end }}
+</ul>
