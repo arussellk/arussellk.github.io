@@ -12,7 +12,6 @@ html {
 
 body {
   margin: 0;
-  line-height: 1.6;
   font-family: sans-serif;
   color: $dark-text-color;
   font-size: 16px;
@@ -22,10 +21,10 @@ body {
   margin: 0 auto;
   padding: 0 $content-padding $content-padding $content-padding;
   max-width: $content-width;
-  max-width: 75ch;
+  max-width: 80ch;
 }
 
-$code-spacing: 10px;
+$code-spacing: 8px;
 
 pre {
   background-color: #eee;
@@ -34,6 +33,7 @@ pre {
   border-radius: $code-spacing/2;
   border: 1px solid #d4d4d4;
   overflow-x: scroll;
+  font-size: 15px;
 
   > code {
     padding: 0;
