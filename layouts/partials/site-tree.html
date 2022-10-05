@@ -2,10 +2,10 @@
   {{ range .Pages }}
     <li>
       {{ if .IsPage }}
-        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        <a href="{{ .RelPermalink }}">{{ title .Title }}</a>
       {{ else }}
         {{/* build layouts/_default/list.html before linking to list pages */}}
-        {{ .Title }}
+        {{ title .Title }}
       {{ end }}
     </li>
     {{ if .Pages }}
