@@ -1,10 +1,5 @@
-$content-width: 650px;
-$content-padding: 10px;
-
-$dark-text-color: #222;
-$light-text-color: #888;
-
-$primary-color: #0097a7;
+$dark-grey: #222;
+$light-grey: #d4d4d4;
 
 html {
   background-color: #fefefe;
@@ -13,25 +8,24 @@ html {
 body {
   margin: 0;
   font-family: sans-serif;
-  color: $dark-text-color;
+  color: $dark-grey;
   font-size: 16px;
 }
 
 .main {
   margin: 0 auto;
-  padding: 0 $content-padding $content-padding $content-padding;
-  max-width: $content-width;
+  max-width: 650px;
   max-width: 80ch;
 }
 
 $code-spacing: 8px;
+$code-background-color: #efefef;
 
 pre {
-  background-color: #eee;
+  background-color: $code-background-color;
   margin: 0;
   padding: $code-spacing;
   border-radius: $code-spacing/2;
-  border: 1px solid #d4d4d4;
   overflow-x: scroll;
   font-size: 15px;
 
@@ -41,26 +35,24 @@ pre {
 }
 
 code {
-  background-color: #eee;
+  background-color: $code-background-color;
   border-radius: $code-spacing/2;
   padding: 0 $code-spacing/2;
 }
 
 table {
   border-collapse: collapse;
-
-  padding: 8px;
   width: 100%;
   text-align: left;
 
   th, td {
-    border: 1px solid #d4d4d4;
-    padding: 8px;
+    border: 1px solid $light-grey;
+    padding: 4px;
   }
 }
 
 #profile {
   width: 150px;
-  border: 2px solid $dark-text-color;
+  border: 2px solid $dark-grey;
   border-radius: 50%;
 }
