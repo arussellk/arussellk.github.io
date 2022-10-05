@@ -1,5 +1,5 @@
 ---
-title: String Union with Runtime Validation and Iteration
+title: String Union Runtime Validation and Iteration
 ---
 
 ```
