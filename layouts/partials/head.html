@@ -11,5 +11,5 @@
   {{ $style := $sass | resources.ToCSS }}
   <link rel="stylesheet" href="{{ $style.Permalink | relURL }}">
 
-  {{ if .Params.has_math }} {{ partial "katex.html" . }}{{ end }}
+  {{ if .Params.hasMath }} {{ partial "katex.html" . }}{{ end }}
 </head>

@@ -1,7 +1,6 @@
 ---
-layout: post
 title: Arithmetic, Geometric, and Harmonic means
-has_math: true
+hasMath: true
 ---
 
 An arithmetic mean is the value \\(a\\) such that:

@@ -1,7 +1,6 @@
 ---
-layout: post
 title: Asymptotic Computational Complexity
-has_math: true
+hasMath: true
 ---
 
 Since asymtotic complexity describes membership in a set,
