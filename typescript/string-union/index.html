@@ -1,12 +1,12 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>String Union Runtime Validation and Iteration</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>String Union Runtime Validation and Iteration</h1><pre tabindex=0><code>const foos = [
-  &#39;bar&#39;,
-  &#39;baz&#39;,
-] as const
-type Foo = typeof foos[number]
-
-const isFoo = (x: string): x is Foo =&gt; foos.includes(x as Foo)
-
-for (const foo of foos) {
-  console.log(foo)
-}
-</code></pre></div></body></html>
+<!doctype html><html lang=en><head><meta charset=utf-8><title>String Union Runtime Validation and Iteration</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>String Union Runtime Validation and Iteration</h1><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ts data-lang=ts><span style=display:flex><span><span style=color:#000;font-weight:700>const</span> foos <span style=color:#000;font-weight:700>=</span> [
+</span></span><span style=display:flex><span>  <span style=color:#d14>&#39;bar&#39;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#d14>&#39;baz&#39;</span>,
+</span></span><span style=display:flex><span>] <span style=color:#000;font-weight:700>as</span> <span style=color:#000;font-weight:700>const</span>
+</span></span><span style=display:flex><span><span style=color:#000;font-weight:700>type</span> Foo <span style=color:#000;font-weight:700>=</span> <span style=color:#000;font-weight:700>typeof</span> foos[<span style=color:#458;font-weight:700>number</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#000;font-weight:700>const</span> isFoo <span style=color:#000;font-weight:700>=</span> (x: <span style=color:#458;font-weight:700>string</span>)<span style=color:#000;font-weight:700>:</span> x <span style=color:#000;font-weight:700>is</span> Foo <span style=color:#000;font-weight:700>=&gt;</span> foos.includes(x <span style=color:#000;font-weight:700>as</span> Foo)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#000;font-weight:700>for</span> (<span style=color:#000;font-weight:700>const</span> foo <span style=color:#000;font-weight:700>of</span> foos) {
+</span></span><span style=display:flex><span>  console.log(foo)
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div></div></body></html>
