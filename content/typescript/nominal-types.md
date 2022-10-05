@@ -2,7 +2,7 @@
 title: Nominal Types
 ---
 
-```
+```ts
 type FooId = string & { __tag: 'FooId' }
 type BarId = string & { __tag: 'BarId' }
 

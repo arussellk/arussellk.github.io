@@ -2,7 +2,7 @@
 title: String Union Runtime Validation and Iteration
 ---
 
-```
+```ts
 const foos = [
   'bar',
   'baz',

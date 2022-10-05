@@ -22,15 +22,15 @@ $code-spacing: 8px;
 $code-background-color: #efefef;
 
 pre {
-  background-color: $code-background-color;
   margin: 0;
   padding: $code-spacing;
-  border-radius: $code-spacing/2;
+  border: 1px solid $light-grey;
   overflow-x: scroll;
   font-size: 15px;
 
   > code {
     padding: 0;
+    background: none;
   }
 }
 

@@ -18,7 +18,7 @@ it when needed.
 ## Types
 
 In TypeScript, you could define and use types to describe objects like this:
-```
+```ts
 // Define the type Foo and use it by name:
 type Foo = { name: string, age: number };
 const foo: Foo = { name: 'Geralt', age: 98 };
@@ -167,7 +167,7 @@ print(out.x)
 The following TypeScript is an implementation of the valid and invalid function
 substitution that we've looked at so far.
 
-```
+```ts
 type A   = { a };
 type AB  = { a, b };
 type ABC = { a, b, c };

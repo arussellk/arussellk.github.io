@@ -38,7 +38,7 @@ did not match the date the user expected. I looked at the code responsible for
 getting the date from the bank's API and found that the previous author did not
 consider timezones in their implementation. The existing code looked like this:
 
-```
+```ts
 // txn is loaded from the API
 const txn = {
   utcDateTime: '2022-04-30T23:01:00.000Z',
@@ -93,7 +93,7 @@ Fortunately, the bank API I was reading from included a
 country code for each
 transaction, allowing me to fix the reported bug for the user in GB:
 
-```
+```ts
 // txn is loaded from the API
 const txn = {
   utcDateTime: '2022-04-30T23:01:00.000Z',
@@ -121,7 +121,7 @@ timezone (e.g., the United States).
 
 Suppose someone makes a purchase late one evening in Denver, CO, USA.
 
-```
+```ts
 // txn is loaded from the API
 const txn = {
   utcDateTime: '2022-05-01T05:34:56.789Z', // same as 2022-04-30T23:34:56-06:00
@@ -189,7 +189,7 @@ Note that the hour is different in the two timestamps; these timestamps
 corresponded to the first minute of the first day of the month in the
 `'America/New_York'` timezone.
 
-```
+```ts
 moment('2022-03-01T05:01:00Z').tz('America/New_York').format()
 //     '2022-03-01T00:01:00-05:00'
 

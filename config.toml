@@ -2,3 +2,7 @@ baseURL = 'https://arussellk.github.io'
 title = 'rk'
 enableEmoji = true
 pluralizeListTitles = false
+
+[markup]
+  [markup.highlight]
+    style = 'github'
