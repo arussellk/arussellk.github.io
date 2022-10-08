@@ -39,6 +39,15 @@ code {
   background-color: $code-background-color;
   border-radius: $code-spacing/2;
   padding: 0 $code-spacing/2;
+
+  // Fixes iOS some lines of code are different sizes due to Hugo syntax
+  // highlighting.
+  // https://github.com/adityatelange/hugo-PaperMod/issues/828
+  // https://stackoverflow.com/a/22417120/3873319
+  text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 table {
