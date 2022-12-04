@@ -1,8 +1,9 @@
 $dark-grey: #222;
 $light-grey: #d4d4d4;
+$offwhite: #fefefe;
 
 html {
-  background-color: #fefefe;
+  background-color: $offwhite;
 }
 
 body {
@@ -17,6 +18,13 @@ body {
   padding: 0 8px;
   max-width: 650px;
   max-width: 80ch;
+}
+
+#profile {
+  width: 150px;
+  border: 2px solid $dark-grey;
+  border-radius: 50%;
+  background: $offwhite;
 }
 
 $code-spacing: 8px;
@@ -59,10 +67,4 @@ table {
     border: 1px solid $light-grey;
     padding: 4px;
   }
-}
-
-#profile {
-  width: 150px;
-  border: 2px solid $dark-grey;
-  border-radius: 50%;
 }
