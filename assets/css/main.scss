@@ -34,7 +34,7 @@ pre {
   margin: 0;
   padding: $code-spacing;
   border: 1px solid $light-grey;
-  overflow-x: scroll;
+  overflow-x: auto;
   font-size: 15px;
 
   > code {
