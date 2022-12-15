@@ -5,14 +5,15 @@ title: Butternut Squash Soup
 Ingredients:
 - 1 butternut squash
 - 1 large yellow onion
-vegetable stock (or water)
+- vegetable stock (or water)
 - tomato (fresh, paste, or canned; about 15oz canned or a few tbsp paste)
 - 1 bay leaf
 - (optional) 1 package cream cheese
 - seasonings: salt, black pepper, herbs (rosemary, thyme, generic italian),
   garlic powder, onion powder, paprika (small amount), chili powder (small
   amount)
-- alternate: omit cream cheese, season with brown sugar, cinnamon, nutmeg, etc.
+- alternate: omit cream cheese, use brown sugar, cinnamon, nutmeg, etc. as
+  seasonings instead
 
 Directions:
 1. Dice and saute onion in large soup pot
