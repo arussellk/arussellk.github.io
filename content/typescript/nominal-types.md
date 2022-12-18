@@ -2,6 +2,13 @@
 title: Nominal Types
 ---
 
+TypeScript uses structural subtyping.
+This means that any type that fits the shape of a different type is compatible.
+When using nominal types, on the other hand, two types are considered distinct and incompatible types
+even if they have the same underlying representation.
+
+Here is a reasonably readable and usable way to have a form of nominal types in TypeScript:
+
 ```ts
 type FooId = string & { __tag: 'FooId' }
 type BarId = string & { __tag: 'BarId' }
