@@ -13,6 +13,10 @@ Ingredients:
 - (optional) chicken, steak, pork, or other meat for filling
 - (optional) cilantro, lime, avocado, or diced tomato for garnish
 
+Variations:
+- green enchilada sauce, half of a shredded+sauted red cabbage for filling,
+  omit bell pepper, omit corn
+
 Directions:
 1. Thinly slice onion and pepper; season with cumin, chili powder, salt and
    saute on high heat to get char. Aim for fajita filling.
