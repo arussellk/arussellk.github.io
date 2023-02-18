@@ -8,7 +8,7 @@ Ingredients:
 - vegetable stock (or water)
 - tomato (fresh, paste, or canned; about 15oz canned or a few tbsp paste)
 - 1 bay leaf
-- (optional) 1 package cream cheese
+- (optional) 1/4 to 1 package cream cheese, to taste
 - seasonings: salt, black pepper, herbs (rosemary, thyme, generic italian),
   garlic powder, onion powder, paprika (small amount), chili powder (small
   amount)
