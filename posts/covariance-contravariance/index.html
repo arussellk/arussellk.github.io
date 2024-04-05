@@ -1,4 +1,5 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><title>Covariance and Contravariance</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Covariance and Contravariance</h1><p>Covariance and contravariance are properties of code substitution;
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Covariance and Contravariance</title>
+<meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Covariance and Contravariance</h1><p>Covariance and contravariance are properties of code substitution;
 they describe what you can and can&rsquo;t do if you want to replace some code
 (e.g., a function call)
 with some other code
@@ -43,9 +44,9 @@ var out: { x } = foo(in)
 print(out.x) // 3
 </code></pre><p>We are going to modify the above code in several ways to explore when changing
 a function&rsquo;s parameter type and return type is valid and invalid.
-✅ indicates that the modification in the section produces a
+&#9989; indicates that the modification in the section produces a
 valid program.
-❌ indicates that the modification produces an invalid program.</p><h3 id=-the-caller-subtypes-the-argument>✅ The Caller Subtypes the Argument</h3><p>Let&rsquo;s add another field <code>c</code> to the <code>in</code> variable before passing it into <code>foo</code>,
+&#x274c; indicates that the modification produces an invalid program.</p><h3 id=white_check_mark-the-caller-subtypes-the-argument>&#9989; The Caller Subtypes the Argument</h3><p>Let&rsquo;s add another field <code>c</code> to the <code>in</code> variable before passing it into <code>foo</code>,
 but keep the implementation of <code>foo</code> the same.
 This program is still valid because it is valid for any caller of <code>foo</code> to pass
 in any subtype of <code>{ a, b }</code>; after all, <code>foo</code> only needs to be able to access
@@ -55,7 +56,7 @@ the <code>a</code> and <code>b</code> fields of the parameter.</p><pre tabindex=
 var in: { a, b, c } = { a: 1, b: 2, c: 3 }
 var out: { x } = foo(in)
 print(out.x) // 3
-</code></pre><h3 id=-the-function-subtypes-the-return-type>✅ The Function Subtypes the Return Type</h3><p>This time, let&rsquo;s change <code>foo</code>s implementation and add another field <code>y</code> to the
+</code></pre><h3 id=white_check_mark-the-function-subtypes-the-return-type>&#9989; The Function Subtypes the Return Type</h3><p>This time, let&rsquo;s change <code>foo</code>s implementation and add another field <code>y</code> to the
 return type, but keep the calling code the same.
 The code that comes after the call to <code>foo</code> only attempts to access the <code>x</code>
 field, so it ok for <code>foo</code> to return any subtype of <code>{ x }</code> and this program
@@ -65,7 +66,7 @@ remains valid.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { x, y
 var in: { a, b } = { a: 1, b: 2 }
 var out: { x } = foo(in)
 print(out.x) // 3
-</code></pre><h3 id=-the-function-subtypes-the-argument-type>❌ The Function Subtypes the Argument Type</h3><p>Let&rsquo;s modify <code>foo</code> to require its parameter to have a <code>c</code> field,
+</code></pre><h3 id=x-the-function-subtypes-the-argument-type>&#x274c; The Function Subtypes the Argument Type</h3><p>Let&rsquo;s modify <code>foo</code> to require its parameter to have a <code>c</code> field,
 but keep the calling site the same.
 This program is no longer valid because the input to <code>foo</code> does not have a <code>c</code>.</p><pre tabindex=0><code>function foo(arg: { a, b, c }) -&gt; { x }
   return { x: arg.a + arg.b + arg.c }
@@ -73,7 +74,7 @@ This program is no longer valid because the input to <code>foo</code> does not h
 var in: { a, b } = { a: 1, b: 2 }
 var out: { x } = foo(in) // Error: &#39;in&#39; is missing the &#39;c&#39; field.
 print(out.x)
-</code></pre><h3 id=-the-function-supertypes-the-argument-type>✅ The Function Supertypes the Argument Type</h3><p>This is the same case as when
+</code></pre><h3 id=white_check_mark-the-function-supertypes-the-argument-type>&#9989; The Function Supertypes the Argument Type</h3><p>This is the same case as when
 <a href=#-the-caller-subtypes-the-argument>the caller subtypes the argument</a>,
 but from the perspective of replacing the function <code>foo</code>.</p><pre tabindex=0><code>function foo(arg: { a }) -&gt; { x }
   return { x: arg.a }
@@ -81,7 +82,7 @@ but from the perspective of replacing the function <code>foo</code>.</p><pre tab
 var in: { a, b } = { a: 1, b: 2 }
 var out: { x } = foo(in)
 print(out.x) // 1
-</code></pre><h3 id=-the-function-supertypes-the-return-type>❌ The Function Supertypes the Return Type</h3><p>Let&rsquo;s modify <code>foo</code> to return the type <code>{ }</code> (a supertype of <code>{ x }</code>),
+</code></pre><h3 id=x-the-function-supertypes-the-return-type>&#x274c; The Function Supertypes the Return Type</h3><p>Let&rsquo;s modify <code>foo</code> to return the type <code>{ }</code> (a supertype of <code>{ x }</code>),
 but keep the calling site the same.
 This program is no longer valid because the output of <code>foo</code> does not have an
 <code>x</code>.</p><pre tabindex=0><code>function foo(arg: { a, b }) -&gt; { }
