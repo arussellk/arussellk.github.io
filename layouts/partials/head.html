@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="/images/favicon-180.png" sizes="180x180">
 
   {{ $sass := resources.Get "css/main.scss" }}
-  {{ $style := $sass | resources.ToCSS }}
+  {{ $style := $sass | css.Sass }}
   <link rel="stylesheet" href="{{ $style.Permalink | relURL }}">
 
   {{ if .Params.hasMath }} {{ partial "katex.html" . }}{{ end }}
