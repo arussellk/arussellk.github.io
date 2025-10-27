@@ -1,12 +1,63 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on rk</title><link>https://arussellk.github.io/posts/</link><description>Recent content in Posts on rk</description><generator>Hugo 0.125.1</generator><language>en</language><atom:link href="https://arussellk.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Arithmetic, Geometric, and Harmonic means</title><link>https://arussellk.github.io/posts/means/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/means/</guid><description>An arithmetic mean is the value \(a\) such that:
-$$ x_1+x_2+\cdots+x_n = \underbrace{a+a+\cdots+a}_{n} $$
-A geometric mean is the value \(g\) such that:
-$$ x_1 \times x_2 \times \cdots \times x_n = \underbrace{g \times g \times \cdots \times g}_{n} $$
-A harmonic mean is the value \(h\) such that:
-$$ \frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}= \underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n} $$
-Deriving the standard formulas Arithmetic mean:
-$$ \begin{aligned} \underbrace{a+a+\cdots+a}_{n} &amp;amp;= x_1+x_2+\cdots+x_n \\ na &amp;amp;= x_1+x_2+\cdots+x_n \\ a &amp;amp;= \frac{x_1+x_2+\cdots+x_n}{n} \end{aligned} $$</description></item><item><title>Asymptotic Computational Complexity</title><link>https://arussellk.github.io/posts/asymptotic-computational-complexity/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/asymptotic-computational-complexity/</guid><description>Since asymtotic complexity describes membership in a set, I wish the preferred notation was \(f(n) \in O(T(n))\) but when talking about asymptotic complexity it is typically written \(f(n)=O(T(n))\). (Interestingly, the German and French Wikipedia articles on Big O notation use \(\in\).)
-Let&amp;rsquo;s say we determine that our algorithm takes \(T(n)\) time to run. We might write something like:
-\[ T(n) = 5n^2 + 2n \log n + 3n + C \]</description></item><item><title>Covariance and Contravariance</title><link>https://arussellk.github.io/posts/covariance-contravariance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/covariance-contravariance/</guid><description>Covariance and contravariance are properties of code substitution; they describe what you can and can&amp;rsquo;t do if you want to replace some code (e.g., a function call) with some other code (e.g., a different function call) in a type-safe way.
-I initially found the concept of covariance and contravariance to be difficult to grasp. This post starts with types and slowly builds to a practical example of covariance and contravariance in a way that will hopefully help you understand it when needed.</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>Advice commonly found on the internet for how to program with timezones is some version of:
-Only store UTC datetimes in your database. (e.g., 2022-01-08T10:45:00.000Z.) Convert the UTC datetime to the user&amp;rsquo;s timezone for display. (e.g., 2022-01-08T10:45:00.000Z -&amp;gt; 2022-01-08T03:45:00-07:00.) This advice is good for keeping track of a single point in time (e.g., when does the meeting start), but sometimes working with timezones is slightly more complicated. The purpose of this post is to explain a situation that I encountered where it took some extra effort to convert the UTC datetime from the database to the appropriate timezone for display.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on rk</title><link>https://arussellk.github.io/posts/</link><description>Recent content in Posts on rk</description><generator>Hugo</generator><language>en</language><atom:link href="https://arussellk.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Arithmetic, Geometric, and Harmonic means</title><link>https://arussellk.github.io/posts/means/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/means/</guid><description>&lt;p&gt;An arithmetic mean is the value \(a\) such that:&lt;/p&gt;
+&lt;p&gt;$$
+x_1+x_2+\cdots+x_n =
+\underbrace{a+a+\cdots+a}_{n}
+$$&lt;/p&gt;
+&lt;p&gt;A geometric mean is the value \(g\) such that:&lt;/p&gt;
+&lt;p&gt;$$
+x_1 \times x_2 \times \cdots \times x_n =
+\underbrace{g \times g \times \cdots \times g}_{n}
+$$&lt;/p&gt;
+&lt;p&gt;A harmonic mean is the value \(h\) such that:&lt;/p&gt;
+&lt;p&gt;$$
+\frac{1}{x_1}+\frac{1}{x_2}+\cdots+\frac{1}{x_n}=
+\underbrace{\frac{1}{h}+\frac{1}{h}+\cdots+\frac{1}{h}}_{n}
+$$&lt;/p&gt;
+&lt;h3 id="deriving-the-standard-formulas"&gt;Deriving the standard formulas&lt;/h3&gt;
+&lt;p&gt;Arithmetic mean:&lt;/p&gt;
+&lt;p&gt;$$
+\begin{aligned}
+\underbrace{a+a+\cdots+a}_{n} &amp;amp;=
+x_1+x_2+\cdots+x_n \\
+na &amp;amp;= x_1+x_2+\cdots+x_n \\
+a &amp;amp;= \frac{x_1+x_2+\cdots+x_n}{n}
+\end{aligned}
+$$&lt;/p&gt;</description></item><item><title>Asymptotic Computational Complexity</title><link>https://arussellk.github.io/posts/asymptotic-computational-complexity/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/asymptotic-computational-complexity/</guid><description>&lt;p&gt;Since asymtotic complexity describes membership in a set,
+I wish the preferred notation was \(f(n) \in O(T(n))\)
+but when talking about asymptotic complexity
+it is typically written \(f(n)=O(T(n))\).
+(Interestingly, the
+&lt;a href="https://de.wikipedia.org/wiki/Landau-Symbole#Definition"&gt;German&lt;/a&gt;
+and
+&lt;a href="https://fr.wikipedia.org/wiki/Comparaison_asymptotique#La_famille_de_notations_de_Landau_O.2C_o.2C_.CE.A9.2C_.CF.89.2C_.CE.98.2C_.C3.95"&gt;French&lt;/a&gt;
+Wikipedia articles on Big O notation use \(\in\).)&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say we determine that our algorithm takes \(T(n)\) time to run.
+We might write something like:&lt;/p&gt;
+&lt;p&gt;\[
+T(n) = 5n^2 + 2n \log n + 3n + C
+\]&lt;/p&gt;
+&lt;p&gt;Then we might want to compare it to some \(f(n)\) using Big O notation like
+\(O(f(n))\). We&amp;rsquo;d write something like this:&lt;/p&gt;</description></item><item><title>Covariance and Contravariance</title><link>https://arussellk.github.io/posts/covariance-contravariance/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/covariance-contravariance/</guid><description>&lt;p&gt;Covariance and contravariance are properties of code substitution;
+they describe what you can and can&amp;rsquo;t do if you want to replace some code
+(e.g., a function call)
+with some other code
+(e.g., a different function call)
+in a type-safe way.&lt;/p&gt;
+&lt;p&gt;I initially found the concept of covariance and contravariance to be difficult
+to grasp.
+This post starts with types and slowly builds to a practical example of
+covariance and contravariance in a way that will hopefully help you understand
+it when needed.&lt;/p&gt;</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>&lt;p&gt;Advice commonly found on the internet for how to program with timezones is some
+version of:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Only store UTC datetimes in your database. (e.g.,
+&lt;code&gt;2022-01-08T10:45:00.000Z&lt;/code&gt;.)&lt;/li&gt;
+&lt;li&gt;Convert the UTC datetime to the user&amp;rsquo;s timezone for display. (e.g.,
+&lt;code&gt;2022-01-08T10:45:00.000Z -&amp;gt; 2022-01-08T03:45:00-07:00&lt;/code&gt;.)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This advice is good for keeping track of a single point in time (e.g., when
+does the meeting start), but sometimes working with timezones is slightly more
+complicated.
+The purpose of this post is to explain a situation that I encountered where it
+took some extra effort to convert the UTC datetime from the database to the
+appropriate timezone for display.&lt;/p&gt;</description></item></channel></rss>
