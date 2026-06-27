@@ -45,3 +45,6 @@ table {
   table th, table td {
     border: 1px solid #d4d4d4;
     padding: 4px; }
+
+img {
+  max-width: 100%; }

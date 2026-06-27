@@ -1,0 +1,12 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Using Playwright Observability for API Tests with Types from openapi</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Using Playwright Observability for API Tests With Types From Openapi</h1><p><a href=https://github.com/arussellk/playwright-openapi>Full working example.</a></p><p>Suppose you have a strongly-typed fetch api layer for your application
+and you want a suite of api tests.
+Playwright has good test discoverability and observability
+(e.g., test timing and request/response body),
+but directly calling your typed <code>fetch</code> within Playwright&rsquo;s
+Node.js process is <em>not</em> recorded by Playwright&rsquo;s network tab.
+If you use <a href=https://playwright.dev/docs/api-testing><code>request</code> as suggested by Playwright&rsquo;s docs</a>,
+the request is captured by playwright, but you will not get the benefit of a strongly-typed
+api layer.</p><p>With a little bit of code, you can have a strongly-typed api and record the request/response
+in Playwright. The key is to realize that Typescript needs to interact with your types while
+Playwright needs to issue the request.</p><p>Key ideas:</p><ol><li>Create an openapi client with a custom fetch implementation</li><li>Make the custom fetch implementation use Playwright</li></ol><p><a href=https://github.com/arussellk/playwright-openapi/blob/99a141d95f2b0f0e44e508b5bc7b594546054536/tests/example.spec.ts#L14>The important code</a>
+make a series of transformations like this:</p><ul><li>TypeScript and developers see request types from openapi&rsquo;s fetch<ul><li>Transform fetch to Playwright request model<ul><li>Playwright makes the request, records activity, and gets a response</li></ul></li><li>Transform Playwright response to fetch response</li></ul></li><li>TypeScript and developers see response types from openapi&rsquo;s fetch</li></ul><p><img src=/images/playwright-openapi.png alt="Screenshot of Playwright with captured fetch request/response"></p></div></body></html>
