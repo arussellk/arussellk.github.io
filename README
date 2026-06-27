@@ -1,1 +1,3 @@
-Using https://gohugo.io/
+Dependencies:
+- Hugo: https://gohugo.io/
+- Just: https://github.com/casey/just
