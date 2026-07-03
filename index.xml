@@ -146,7 +146,18 @@ We can do better than this:&lt;/p&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style="display:flex;"&gt;&lt;span&gt;&lt;span style="color:#1f2328"&gt;};&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If the code in question does not return a value, you will not get a compile-time error.
 This is bad because a future developer can unintentionally miss that they should modify this code
-when adding a new &lt;code&gt;Foo&lt;/code&gt;:&lt;/p&gt;</description></item><item><title>Nominal Types</title><link>https://arussellk.github.io/typescript/nominal-types/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/typescript/nominal-types/</guid><description>&lt;p&gt;TypeScript uses structural subtyping.
+when adding a new &lt;code&gt;Foo&lt;/code&gt;:&lt;/p&gt;</description></item><item><title>Fixing requests to old JS bundles</title><link>https://arussellk.github.io/posts/fix-requests-to-old-js-bundles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/fix-requests-to-old-js-bundles/</guid><description>&lt;p&gt;In my frontend application, I sometimes got &lt;code&gt;SyntaxError: Unexpected token '&amp;lt;'&lt;/code&gt;
+errors while loading the homepage. How? Why only sometimes?&lt;/p&gt;
+&lt;p&gt;I looked in Datadog logs and could see that the homepage html response looked normal,
+but some of the following requests to JS files were all the same byte length.
+(e.g., &lt;code&gt;https://example.com/&lt;/code&gt; looked fine,
+but &lt;code&gt;https://example.com/_build/abc123.js&lt;/code&gt;
+and &lt;code&gt;https://example.com/_build/def456.js&lt;/code&gt;
+were suspiciously the same byte length.)
+I know that for many frontend single-page app (SPA) systems, if an HTTP request path
+does not match a file path, the server will respond with the homepage HTML so that the JS
+SPA code can handle the rest of the app setup and routing.
+Knowing this was enough for me to put together a theory of what was happening and test it.&lt;/p&gt;</description></item><item><title>Nominal Types</title><link>https://arussellk.github.io/typescript/nominal-types/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/typescript/nominal-types/</guid><description>&lt;p&gt;TypeScript uses structural subtyping.
 This means that any type that fits the shape of a different type is compatible.
 When using nominal types, on the other hand, two types are considered distinct and incompatible types
 even if they have the same underlying representation.&lt;/p&gt;

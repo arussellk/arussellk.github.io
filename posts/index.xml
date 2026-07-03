@@ -47,7 +47,18 @@ in a type-safe way.&lt;/p&gt;
 to grasp.
 This post starts with types and slowly builds to a practical example of
 covariance and contravariance in a way that will hopefully help you understand
-it when needed.&lt;/p&gt;</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>&lt;p&gt;Advice commonly found on the internet for how to program with timezones is some
+it when needed.&lt;/p&gt;</description></item><item><title>Fixing requests to old JS bundles</title><link>https://arussellk.github.io/posts/fix-requests-to-old-js-bundles/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/fix-requests-to-old-js-bundles/</guid><description>&lt;p&gt;In my frontend application, I sometimes got &lt;code&gt;SyntaxError: Unexpected token '&amp;lt;'&lt;/code&gt;
+errors while loading the homepage. How? Why only sometimes?&lt;/p&gt;
+&lt;p&gt;I looked in Datadog logs and could see that the homepage html response looked normal,
+but some of the following requests to JS files were all the same byte length.
+(e.g., &lt;code&gt;https://example.com/&lt;/code&gt; looked fine,
+but &lt;code&gt;https://example.com/_build/abc123.js&lt;/code&gt;
+and &lt;code&gt;https://example.com/_build/def456.js&lt;/code&gt;
+were suspiciously the same byte length.)
+I know that for many frontend single-page app (SPA) systems, if an HTTP request path
+does not match a file path, the server will respond with the homepage HTML so that the JS
+SPA code can handle the rest of the app setup and routing.
+Knowing this was enough for me to put together a theory of what was happening and test it.&lt;/p&gt;</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>&lt;p&gt;Advice commonly found on the internet for how to program with timezones is some
 version of:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Only store UTC datetimes in your database. (e.g.,

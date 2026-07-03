@@ -1,0 +1,85 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Fixing requests to old JS bundles</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Fixing Requests to Old JS Bundles</h1><p>In my frontend application, I sometimes got <code>SyntaxError: Unexpected token '&lt;'</code>
+errors while loading the homepage. How? Why only sometimes?</p><p>I looked in Datadog logs and could see that the homepage html response looked normal,
+but some of the following requests to JS files were all the same byte length.
+(e.g., <code>https://example.com/</code> looked fine,
+but <code>https://example.com/_build/abc123.js</code>
+and <code>https://example.com/_build/def456.js</code>
+were suspiciously the same byte length.)
+I know that for many frontend single-page app (SPA) systems, if an HTTP request path
+does not match a file path, the server will respond with the homepage HTML so that the JS
+SPA code can handle the rest of the app setup and routing.
+Knowing this was enough for me to put together a theory of what was happening and test it.</p><hr><p>Suppose the following:</p><ul><li>There are multiple k8s pods hosting this frontend site.</li><li>The <code>abc123</code> portion of <code>https://example.com/_build/abc123.js</code> changes for each build.</li><li>The site is deployed. Specifically, k8s pods with the old build <code>A</code> are stopping and new pods with
+build <code>B</code> are starting.</li></ul><p>My theory was that this sequence of events happens:</p><ol><li>The browser fetches the homepage from build <code>A</code></li><li>Some version <code>A</code> pods stop, some version <code>B</code> pods start</li><li>The browser makes <code>N</code> follow-up requests for <code>/_build/A_1.js</code>, <code>/_build/A_2.js</code>, &mldr;, <code>/_build/A_N.js</code>.</li><li>The request for <code>/_build/A_n.js</code> reaches a pod hosting version <code>B</code>. The pod checks its
+filesystem, does not find <code>/_build/A_n.js</code> and replies with version <code>B</code> homepage HTML.</li><li>The browser page crashes with <code>SyntaxError: Unexpected token '&lt;'</code>.</li></ol><hr><p>I was pretty confident this was the problem, but I wanted to put together some code to exercise the
+issue so that we could easily check whether a proposed fix worked well. I threw together a script
+to exercise the root issue: requests to JS file references seen in version <code>A</code> go to a pod that has
+content from version <code>B</code> and get an HTML response.</p><div class=highlight><pre tabindex=0 style=background-color:#f7f7f7;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#cf222e>while</span> <span style=color:#1f2328>(</span><span style=color:#cf222e>true</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>await</span> <span style=color:#1f2328>collectAndReport</span><span style=color:#1f2328>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>barrangeDelayMs</span> <span style=color:#0550ae>=</span> <span style=color:#0550ae>300</span><span style=color:#1f2328>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>await</span> <span style=color:#1f2328>sleep</span><span style=color:#1f2328>(</span><span style=color:#1f2328>barrageDelayMs</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span><span style=color:#1f2328>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cf222e>function</span> <span style=color:#1f2328>collectAndReport</span><span style=color:#1f2328>()</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>bodyText</span> <span style=color:#0550ae>=</span> <span style=color:#cf222e>await</span> <span style=color:#1f2328>getHomePage</span><span style=color:#1f2328>();</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>timestamp</span> <span style=color:#0550ae>=</span> <span style=color:#cf222e>new</span> <span style=color:#6639ba>Date</span><span style=color:#1f2328>().</span><span style=color:#1f2328>toISOString</span><span style=color:#1f2328>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>scripts</span> <span style=color:#0550ae>=</span> <span style=color:#6639ba>Array</span><span style=color:#1f2328>.</span><span style=color:#1f2328>from</span><span style=color:#1f2328>(</span><span style=color:#1f2328>bodyText</span><span style=color:#1f2328>.</span><span style=color:#1f2328>matchAll</span><span style=color:#1f2328>(</span><span style=color:#0a3069>/&lt;script src=&#34;(.*?)&#34;/g</span><span style=color:#1f2328>));</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>srcPaths</span> <span style=color:#0550ae>=</span> <span style=color:#1f2328>matchs</span><span style=color:#1f2328>.</span><span style=color:#1f2328>map</span><span style=color:#1f2328>(([</span><span style=color:#1f2328>match</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>captureGroup</span><span style=color:#1f2328>])</span> <span style=color:#1f2328>=&gt;</span> <span style=color:#1f2328>captureGroup</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>fetches</span> <span style=color:#0550ae>=</span> <span style=color:#1f2328>srcPaths</span><span style=color:#1f2328>.</span><span style=color:#1f2328>map</span><span style=color:#1f2328>(</span><span style=color:#cf222e>async</span> <span style=color:#1f2328>(</span><span style=color:#1f2328>p</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>=&gt;</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#cf222e>const</span> <span style=color:#1f2328>resp</span> <span style=color:#0550ae>=</span> <span style=color:#cf222e>await</span> <span style=color:#1f2328>fetch</span><span style=color:#1f2328>(</span><span style=color:#0a3069>&#39;https://example.com&#39;</span> <span style=color:#0550ae>+</span> <span style=color:#1f2328>p</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>    <span style=color:#cf222e>const</span> <span style=color:#1f2328>text</span> <span style=color:#0550ae>=</span> <span style=color:#cf222e>await</span> <span style=color:#1f2328>resp</span><span style=color:#1f2328>.</span><span style=color:#1f2328>text</span><span style=color:#1f2328>();</span>
+</span></span><span style=display:flex><span>    <span style=color:#cf222e>return</span> <span style=color:#1f2328>[</span><span style=color:#1f2328>p</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>text</span><span style=color:#1f2328>];</span>
+</span></span><span style=display:flex><span>  <span style=color:#1f2328>});</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>srcPathAndTexts</span> <span style=color:#0550ae>=</span> <span style=color:#1f2328>(</span><span style=color:#cf222e>await</span> <span style=color:#6639ba>Promise</span><span style=color:#1f2328>.</span><span style=color:#1f2328>allSettled</span><span style=color:#1f2328>(</span><span style=color:#1f2328>fetches</span><span style=color:#1f2328>)).</span><span style=color:#1f2328>map</span><span style=color:#1f2328>(</span><span style=color:#1f2328>x</span> <span style=color:#1f2328>=&gt;</span> <span style=color:#1f2328>x</span><span style=color:#1f2328>.</span><span style=color:#1f2328>value</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>anyHtml</span> <span style=color:#0550ae>=</span> <span style=color:#1f2328>srcPathAndTexts</span><span style=color:#1f2328>.</span><span style=color:#1f2328>some</span><span style=color:#1f2328>(([</span><span style=color:#1f2328>_</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>text</span><span style=color:#1f2328>])</span> <span style=color:#1f2328>=&gt;</span> <span style=color:#1f2328>text</span><span style=color:#1f2328>.</span><span style=color:#1f2328>startsWith</span><span style=color:#1f2328>(</span><span style=color:#0a3069>&#39;&lt;&#39;</span><span style=color:#1f2328>));</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>const</span> <span style=color:#1f2328>preamble</span> <span style=color:#0550ae>=</span>
+</span></span><span style=display:flex><span>    <span style=color:#0a3069>`Barrage started at </span><span style=color:#0a3069>${</span><span style=color:#1f2328>timestamp</span><span style=color:#0a3069>}</span><span style=color:#0a3069>: </span><span style=color:#0a3069>${</span><span style=color:#1f2328>anyHtml</span> <span style=color:#0550ae>?</span> <span style=color:#0a3069>&#39;has some HTML&#39;</span><span style=color:#0550ae>:</span> <span style=color:#0a3069>&#39;is all JS&#39;</span><span style=color:#0a3069>}</span><span style=color:#0a3069>`</span><span style=color:#1f2328>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#1f2328>console</span><span style=color:#1f2328>.</span><span style=color:#1f2328>log</span><span style=color:#1f2328>(</span><span style=color:#1f2328>preamble</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>if</span> <span style=color:#1f2328>(</span><span style=color:#1f2328>anyHtml</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#cf222e>for</span> <span style=color:#1f2328>(</span><span style=color:#cf222e>const</span> <span style=color:#1f2328>[</span><span style=color:#1f2328>p</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>text</span><span style=color:#1f2328>]</span> <span style=color:#cf222e>of</span> <span style=color:#1f2328>srcPathAndTexts</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>      <span style=color:#cf222e>const</span> <span style=color:#1f2328>isHtml</span> <span style=color:#0550ae>=</span> <span style=color:#1f2328>text</span><span style=color:#1f2328>.</span><span style=color:#1f2328>startsWith</span><span style=color:#1f2328>(</span><span style=color:#0a3069>&#39;&lt;&#39;</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>      <span style=color:#1f2328>console</span><span style=color:#1f2328>.</span><span style=color:#1f2328>log</span><span style=color:#1f2328>(</span><span style=color:#0a3069>&#39;  &#39;</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>p</span><span style=color:#1f2328>,</span> <span style=color:#0a3069>&#39;is HTML?&#39;</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>isHtml</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>    <span style=color:#1f2328>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#1f2328>}</span>
+</span></span><span style=display:flex><span><span style=color:#1f2328>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#cf222e>async</span> <span style=color:#cf222e>function</span> <span style=color:#1f2328>sleep</span><span style=color:#1f2328>(</span><span style=color:#1f2328>ms</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#cf222e>return</span> <span style=color:#cf222e>new</span> <span style=color:#6639ba>Promise</span><span style=color:#1f2328>((</span><span style=color:#1f2328>resolve</span><span style=color:#1f2328>)</span> <span style=color:#1f2328>=&gt;</span> <span style=color:#1f2328>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#1f2328>setTimeout</span><span style=color:#1f2328>(</span><span style=color:#1f2328>resolve</span><span style=color:#1f2328>,</span> <span style=color:#1f2328>ms</span><span style=color:#1f2328>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#1f2328>});</span>
+</span></span><span style=display:flex><span><span style=color:#1f2328>}</span>
+</span></span></code></pre></div><p>Running this script during a deployment would give output like this.
+Before and after a deployment, all of the script responses were JS.
+Just as pods started to switch from version <code>A</code> to <code>B</code>, we would see a few different cases:</p><ol><li>The initial HTML was version <code>A</code>, but at least one JS routed to a pod with version <code>B</code></li><li>The initial HTML was version <code>B</code>, but at least one JS routed to a pod with version <code>A</code></li><li>The initial HTML and all JS routed to pod(s) with the same version</li></ol><pre tabindex=0><code>Barrage started at &lt;t1&gt;: is all JS
+Barrage started at &lt;t2&gt;: is all JS
+Barrage started at &lt;t3&gt;: has some HTML
+  /_build/A_1.js is HTML? true
+  /_build/A_2.js is HTML? false
+  /_build/A_3.js is HTML? false
+Barrage started at &lt;t4&gt;: is all JS
+Barrage started at &lt;t5&gt;: has some HTML
+  /_build/B_1.js is HTML? false
+  /_build/B_2.js is HTML? true
+  /_build/B_3.js is HTML? false
+Barrage started at &lt;t6&gt;: is all JS
+Barrage started at &lt;t7&gt;: is all JS
+</code></pre><p>Using the script, we found that site visitors could encounter a page crash for about 90s during a
+deployment (the deploy time of 30s times three replicas deployed sequentially).
+The fix we chose was to introduce a kind of sticky session to encourage the system to route requests
+to a pod that has the right version of content.
+<a href="https://github.com/kubernetes/ingress-nginx/blob/dbb11b92ddb77bee9c35e462479129354c84f939/docs/examples/affinity/cookie/README.md?plain=1#L11">ingress-nginx session affinity</a></p><p>After deploying the fix, the script demonstrated that users could still encoutner a page crash in a
+short time window with probability <code>p &lt;= 1/num_pods</code>. The page crash could still happen if
+nginx assigned a session affinity cookie for a pod immediately before killing the pod.
+The short time window was the network round-trip from nginx to the browser and back.
+Blue/green deployments would eliminate this issue by letting the system know it was <em>about</em> to kill
+a pod and be smarter about assigning sticky sessions.</p><hr><p>After making this fix, I found that users could also run into a related issue due to trying to load
+per-route JS bundles well after a deploy has concluded
+(aka chunking or <a href=https://nextjs.org/docs/pages/guides/lazy-loading>lazy loading</a>.
+The root problem of making a request for content for a &ldquo;stale&rdquo; script that can only be served by a
+specific version of pods is the same problem as before.
+Hotswapping script references or keeping the previous application version scripts available in a new
+deployment could alleviate this issue, but there are tradeoffs and complexity with each idea.</p></div></body></html>
