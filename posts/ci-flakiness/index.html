@@ -1,0 +1,35 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Stabilize CI Network Flakiness</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=/images/favicon-32.png sizes=32x32><link rel=apple-touch-icon href=/images/favicon-180.png sizes=180x180><link rel=stylesheet href=/css/main.css></head><body><div class=main><p><a href=/>home</a></p><h1>Stabilize CI Network Flakiness</h1><p>We run integration tests in our CI/CD pipeline.
+For a while, it was common for a C# integration test to fail with this message:</p><pre tabindex=0><code>System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---&gt; System.IO.IOException: The response ended prematurely.
+</code></pre><p>The network failure was transient and you could usually re-run the tests to get them to pass.
+As the number of tests grew, the chances of hitting a network hiccup went up, and eventually
+most programmers were clicking to re-run tests on most PRs - sometimes more than once!</p><p>I decided to address the flakiness so that programmers could spend less time waiting for pipelines
+to re-run.
+Adding retries to the integration test HTTP client for network hiccups seemed like the right solution,
+so I wrote an HTTP server to intentionally cause <code>The response ended prematurely.</code> errors
+and ensure that my fix for the integration test runner worked.</p><p>This is the script I wrote:</p><pre tabindex=0><code>const http = require(&#39;http&#39;);
+
+let counter = 0;
+
+const server = http.createServer((req, res) =&gt; {
+  counter++;
+  const action = counter % 10 === 0 ? &#39;end&#39; : &#39;destroy&#39;;
+  console.log(`connection ${counter} -&gt; ${action}`);
+
+  res.write(&#39;any response&#39;);
+  if (action === &#39;end&#39;) {
+    res.end();
+  } else {
+    // abruptly stop the connection, trigger responses ended prematurely
+    res.socket.destroy();
+  }
+});
+
+const port = 8080;
+server.listen(port);
+</code></pre><p>If you built your own <code>HttpClient</code> like we did for integration tests
+<a href=https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines#resilience-with-static-clients>this documentation demonstrates how to add retries to your client</a>.
+<a href=https://learn.microsoft.com/en-us/dotnet/core/resilience/>This documentation shows how to add resiliency pipelines to DI for other uses in a .NET application</a>.</p><p>Prior to implementing the resiliency pipeline, we had CI failures on the majority of PRs.
+Afterwards, <code>The response ended prematurely</code> failures went to nearly zero
+and only a couple of PRs per week across all programmers had to be rerun for transient network
+issues.</p></div></body></html>

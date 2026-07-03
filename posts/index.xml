@@ -58,7 +58,13 @@ were suspiciously the same byte length.)
 I know that for many frontend single-page app (SPA) systems, if an HTTP request path
 does not match a file path, the server will respond with the homepage HTML so that the JS
 SPA code can handle the rest of the app setup and routing.
-Knowing this was enough for me to put together a theory of what was happening and test it.&lt;/p&gt;</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>&lt;p&gt;Advice commonly found on the internet for how to program with timezones is some
+Knowing this was enough for me to put together a theory of what was happening and test it.&lt;/p&gt;</description></item><item><title>Stabilize CI Network Flakiness</title><link>https://arussellk.github.io/posts/ci-flakiness/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/ci-flakiness/</guid><description>&lt;p&gt;We run integration tests in our CI/CD pipeline.
+For a while, it was common for a C# integration test to fail with this message:&lt;/p&gt;
+&lt;pre tabindex="0"&gt;&lt;code&gt;System.Net.Http.HttpRequestException: An error occurred while sending the request.
+ ---&amp;gt; System.IO.IOException: The response ended prematurely.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The network failure was transient and you could usually re-run the tests to get them to pass.
+As the number of tests grew, the chances of hitting a network hiccup went up, and eventually
+most programmers were clicking to re-run tests on most PRs - sometimes more than once!&lt;/p&gt;</description></item><item><title>Time handling for purchase transactions</title><link>https://arussellk.github.io/posts/timezones/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://arussellk.github.io/posts/timezones/</guid><description>&lt;p&gt;Advice commonly found on the internet for how to program with timezones is some
 version of:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Only store UTC datetimes in your database. (e.g.,
